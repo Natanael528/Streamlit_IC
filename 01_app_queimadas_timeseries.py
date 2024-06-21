@@ -15,7 +15,7 @@ def list_zip_files(url):
     response = requests.get(url)
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
-        zip_files = [url + '/' + a['href'] for a in soup.find_all('a', href=True) if a['href'].endswith('.zip')]
+        zip_files = [url + a['href'] for a in soup.find_all('a', href=True) if a['href'].endswith('.zip')]
         return zip_files
     else:
         print(f"Falha ao acessar {url}")
