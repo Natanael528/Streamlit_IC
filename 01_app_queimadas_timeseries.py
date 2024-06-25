@@ -1,103 +1,105 @@
-# importa bibliotecas
-import streamlit as st
+import requests
 import pandas as pd
-import plotly.express as px
-import datetime
-import numpy as np
-import time
-from datetime import datetime
-import requests                  # HTTP library for Python
-from bs4 import BeautifulSoup    # Pulling data out of HTML and XML files
-import re                        # Regular expression operations
+from bs4 import BeautifulSoup
+import re
 import io
+import streamlit as st
+import plotly.express as px
+from datetime import datetime
 import zipfile
-# vamos ignorar vários avisos
-import warnings
-warnings.filterwarnings('ignore')
 
 
-####################################################DOWNLOAD DOS DADOS###########################################################################################
+##########################################DOWNLOAD#####################################################################
 # URLs dos dados de queimadas do INPE
 url_ano_anteriores = 'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/anual/Brasil_sat_ref/' # dados de 2003 - 2023
 url_ano_atual = 'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/' # dados de 2024
 
-# Função para baixar e ler arquivos ZIP diretamente para um DataFrame
-def baixar_dados_zip(url_base):
-    result = requests.get(url_base)
-    soup = BeautifulSoup(result.content, 'html.parser')
-    zip_files = soup.find_all('a', href=re.compile("\.zip"))
-    
-    dataframes = []
-    for zip_file in zip_files:
-        filename = zip_file.get_text()
-        url = f'{url_base}{filename}'
-        
-        myfile = requests.get(url)
-        with zipfile.ZipFile(io.BytesIO(myfile.content)) as z:
-            for file_name in z.namelist():
-                with z.open(file_name) as f:
-                    df = pd.read_csv(f)
-                    # Renomear colunas específicas se necessário
-                    if 'focos*.zip' in filename:
-                        df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
-                    dataframes.append(df)
-    
-    return pd.concat(dataframes, ignore_index=True)
 
-# Função para baixar e ler arquivos CSV diretamente para um DataFrame
-def baixar_dados_csv(url_base):
-    result = requests.get(url_base)
-    soup = BeautifulSoup(result.content, 'html.parser')
-    csv_files = soup.find_all('a', href=re.compile("\.csv"))
-    
-    dataframes = []
-    for csv_file in csv_files:
-        filename = csv_file.get_text()
-        url = f'{url_base}{filename}'
-        
-        myfile = requests.get(url)
-        df = pd.read_csv(io.StringIO(myfile.content.decode('utf-8')), usecols=['lat', 'lon', 'data_hora_gmt', 'satelite', 'municipio', 'estado', 'bioma'])
-        dataframes.append(df)
-    
-    df = pd.concat(dataframes, ignore_index=True)
-    return df[df['satelite'] == 'AQUA_M-T'].drop(columns=['satelite'])
+#           ANOS ANTERIORES: focos_br_ref_2003.zip	
 
-# Baixar dados de 2003 a 2023
-df_2003_a_2023 = baixar_dados_zip(url_ano_anteriores)
+result = requests.get(url_ano_anteriores)                   # Make the connection
+soup = BeautifulSoup(result.content, 'html.parser')         # Parse the HTML file
+zip_files = soup.find_all('a', href=re.compile("\.zip"))    # Find all "zip" files in the server
+
+df_2003_a_2023 = pd.DataFrame()                             # Create an empty dataframe
+
+for zip_file in zip_files:
+    filename = zip_file.get_text()
+    url = f'{url_ano_anteriores}{filename}'
+    print("O seguinte arquivo será baixado: ", filename)
+
+    # envia uma requisição para a URL especificada
+    myfile = requests.get(url)
+
+    # lê o arquivo zip diretamente em um dataframe
+    with zipfile.ZipFile(io.BytesIO(myfile.content)) as z:
+        for zip_info in z.infolist():
+            with z.open(zip_info) as f:
+                df0 = pd.read_csv(f)
+                # muda o nome da "latitude' para "lat" e "longitude" para "lon" do arquivo de 2023
+                if filename == 'focos_br_ref_2023.zip':
+                    df0.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
+
+                # junta a tabela que foi lida com a anterior
+                df_2003_a_2023 = pd.concat([df_2003_a_2023, df0], ignore_index=True)
 
 # remove colunas
 df_2003_a_2023.drop(['id_bdq','foco_id','pais'], axis=1, inplace=True)
+
 # renomeia coluna
 df_2003_a_2023.rename(columns={'data_pas': 'data'}, inplace=True)
+
 # reposiciona as colunas
 df_2003_a_2023 = df_2003_a_2023[['data','lat','lon','municipio','estado','bioma']]
 
+# mostra o dataframe
+print(df_2003_a_2023)
 
 
-# Baixar dados de 2024
-df_2024 = baixar_dados_csv(url_ano_atual)
+#            ANO ATUAL: focos_mensal_br_202401.csv	
+
+result = requests.get(url_ano_atual)                       
+soup = BeautifulSoup(result.content, 'html.parser')        
+csv_files = soup.find_all('a', href=re.compile("\.csv"))   
+
+df_2024 = pd.DataFrame()                                   
+
+for csv_file in csv_files:
+    filename = csv_file.get_text()
+    url = f'{url_ano_atual}{filename}'
+    print("O seguinte arquivo será baixado: ", filename)
+
+    # envia uma requisição para a URL especificada
+    myfile = requests.get(url)
+
+    # lê o arquivo csv diretamente em um dataframe
+    df0 = pd.read_csv(io.StringIO(myfile.content.decode('utf-8')), usecols=['lat', 'lon', 'data_hora_gmt', 'satelite', 'municipio', 'estado', 'bioma'])
+
+    # junta a tabela que foi lida com a anterior
+    df_2024 = pd.concat([df_2024, df0], ignore_index=True)
+
+# seleciona para o satélite de referência AQUA_M-T
+df_2024 = df_2024[df_2024['satelite']=='AQUA_M-T']
+
+# remove colunas
+df_2024.drop(['satelite'], axis=1, inplace=True)
 
 # renomeia coluna
 df_2024.rename(columns={'data_hora_gmt': 'data'}, inplace=True)
+
 # reposiciona as colunas
 df_2024 = df_2024[['data','lat','lon','municipio','estado','bioma']]
 
+# cria um dataframe combinado
+df_total = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
+df_total.to_csv('df_total.csv', index=False)
+####################################################APP###########################################################
 
-
-# Combinar os dados em um único DataFrame
-df_final = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
-
-####################################################APP###########################################################################################
-
-# configuração da página
-st.set_page_config(layout='wide', initial_sidebar_state='expanded')
-#st.image("logo_queimadas.png", use_column_width=True)
-st.title('Série Temporal de Focos de Calor')
 # função que carrega a tabela de queimadas
 @st.cache_data
 def carregar_dados():
     # leitura do dataframe
-    df = pd.read_csv(df_final)
+    df = pd.read_csv('/workspaces/Streamlit_IC/df_total.csv')
 
     # insere a coluna data como DateTime no DataFrame
     df['data'] = pd.to_datetime(df['data'])
