@@ -5,7 +5,7 @@ import re
 import io
 import streamlit as st
 import plotly.express as px
-from datetime import datetime
+from datetime import datetime, date
 import zipfile
 
 
@@ -92,42 +92,33 @@ df_2024 = df_2024[['data','lat','lon','municipio','estado','bioma']]
 
 # cria um dataframe combinado
 df_total = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
+
+df_total['data'] = pd.to_datetime(df_total['data'])
+
+# seta a coluna data com o index do dataframe
+df_total.set_index('data', inplace=True)
+
+# coloca em ordem crescente de data
+df_total.sort_values('data', inplace=True)
+
 ####################################################APP###########################################################
-
-# função que carrega a tabela de queimadas
-@st.cache_data
-def carregar_dados():
-    # leitura do dataframe
-    df = pd.read_csv(df_total)
-
-    # insere a coluna data como DateTime no DataFrame
-    df['data'] = pd.to_datetime(df['data'])
-
-    # seta a coluna data com o index do dataframe
-    df.set_index('data', inplace=True)
-
-    # coloca em ordem crescente de data
-    df = df.sort_values('data')
-    
-    return df
 
 # sidebar
 with st.sidebar:
-
     st.title('Filtros')
     st.divider()
-    df = carregar_dados()
+    
 
     # seleciona o "ESTADO"
-    estados = sorted(df['estado'].unique().tolist())
+    estados = sorted(df_total['estado'].unique().tolist())
     estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
 
     # seleciona a "DATA"
-    data_inicial = st.date_input('Digite a data **INICIAL**:', datetime.date(2002, 1, 1))
+    data_inicial = st.date_input('Digite a data **INICIAL**:', date(2002, 1, 1))
     data_final = st.date_input('Digite a data **FINAL**:')
 
     # filtra por Data
-    df_filtrado = df.loc[str(data_inicial):str(data_final)]
+    df_filtrado = df_total.loc[str(data_inicial):str(data_final)]
 
     # filtra por Estado  
     df_filtrado = df_filtrado[df_filtrado['estado'] == estado_selecionado]
@@ -147,7 +138,7 @@ col3, col4 = st.columns(2)  # Isto significa 2
 # DIÁRIO TOTAL
 diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
 fig_diaria = px.line(diaria, width=300, height=300)
-fig_diaria.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor", 
+fig_diaria.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor",
                          title={'text': 'Diária',
                                 'y': 0.93,
                                 'x': 0.5,
@@ -162,7 +153,7 @@ anual = df_filtrado.groupby(pd.Grouper(freq='1YE')).count()['lat']
 
 fig_anual = px.bar(x=anual.index.year, y=anual.values, width=300, height=300)
 
-fig_anual.update_layout(showlegend=False, xaxis_title="Ano", yaxis_title="Quantidade de Focos de Calor", 
+fig_anual.update_layout(showlegend=False, xaxis_title="Ano", yaxis_title="Quantidade de Focos de Calor",
                         title={'text': 'Anual',
                                'y': 0.93,
                                'x': 0.5,
@@ -175,7 +166,7 @@ col2.plotly_chart(fig_anual, use_container_width=True)
 # MENSAL TOTAL
 mensal = df_filtrado.groupby(pd.Grouper(freq='1ME')).count()['lat']
 fig_mensal = px.line(mensal, width=300, height=300)
-fig_mensal.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor", 
+fig_mensal.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor",
                          title={'text': 'Mensal',
                                 'y': 0.93,
                                 'x': 0.5,
@@ -184,18 +175,18 @@ fig_mensal.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="
                                 'font_size': 20,
                                 'font_color': 'red'})
 col3.plotly_chart(fig_mensal, use_container_width=True)
-    
+
 # MENSAL MÉDIO
 mensal_climatologia = mensal.groupby(mensal.index.month).mean()
 fig_mensal_climatologia = px.bar(mensal_climatologia, width=300, height=300)
-fig_mensal_climatologia.update_layout(showlegend=False, xaxis_title="Mês", yaxis_title="Quantidade de Focos de Calor", 
-                         title={'text': 'Mensal Média',
-                                'y': 0.93,
-                                'x': 0.5,
-                                'xanchor': 'center',
-                                'yanchor': 'top',
-                                'font_size': 20,
-                                'font_color': 'red'})
+fig_mensal_climatologia.update_layout(showlegend=False, xaxis_title="Mês", yaxis_title="Quantidade de Focos de Calor",
+                                      title={'text': 'Mensal Média',
+                                             'y': 0.93,
+                                             'x': 0.5,
+                                             'xanchor': 'center',
+                                             'yanchor': 'top',
+                                             'font_size': 20,
+                                             'font_color': 'red'})
 col4.plotly_chart(fig_mensal_climatologia, use_container_width=True)
 
 #print(anual)
