@@ -92,14 +92,13 @@ df_2024 = df_2024[['data','lat','lon','municipio','estado','bioma']]
 
 # cria um dataframe combinado
 df_total = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
-df_total.to_csv('df_total.csv', index=False)
 ####################################################APP###########################################################
 
 # função que carrega a tabela de queimadas
 @st.cache_data
 def carregar_dados():
     # leitura do dataframe
-    df = pd.read_csv('/workspaces/Streamlit_IC/df_total.csv')
+    df = pd.read_csv(df_total)
 
     # insere a coluna data como DateTime no DataFrame
     df['data'] = pd.to_datetime(df['data'])
