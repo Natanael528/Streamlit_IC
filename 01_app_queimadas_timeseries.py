@@ -42,7 +42,7 @@ def baixar_dados_zip(url_base):
                 with z.open(file_name) as f:
                     df = pd.read_csv(f)
                     # Renomear colunas específicas se necessário
-                    if 'focos.zip' in filename:
+                    if 'focos*.zip' in filename:
                         df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
                     dataframes.append(df)
     
@@ -68,17 +68,28 @@ def baixar_dados_csv(url_base):
 
 # Baixar dados de 2003 a 2023
 df_2003_a_2023 = baixar_dados_zip(url_ano_anteriores)
+
+# remove colunas
+df_2003_a_2023.drop(['id_bdq','foco_id','pais'], axis=1, inplace=True)
+# renomeia coluna
 df_2003_a_2023.rename(columns={'data_pas': 'data'}, inplace=True)
-df_2003_a_2023 = df_2003_a_2023[['data', 'lat', 'lon', 'municipio', 'estado', 'bioma']]
+# reposiciona as colunas
+df_2003_a_2023 = df_2003_a_2023[['data','lat','lon','municipio','estado','bioma']]
+
+
 
 # Baixar dados de 2024
 df_2024 = baixar_dados_csv(url_ano_atual)
+
+# renomeia coluna
 df_2024.rename(columns={'data_hora_gmt': 'data'}, inplace=True)
-df_2024 = df_2024[['data', 'lat', 'lon', 'municipio', 'estado', 'bioma']]
+# reposiciona as colunas
+df_2024 = df_2024[['data','lat','lon','municipio','estado','bioma']]
+
+
 
 # Combinar os dados em um único DataFrame
 df = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
-
 ####################################################APP###########################################################################################
 # função que carrega a tabela de queimadas
 @st.cache_data
