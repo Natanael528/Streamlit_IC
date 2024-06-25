@@ -79,7 +79,6 @@ df_2024 = df_2024[['data', 'lat', 'lon', 'municipio', 'estado', 'bioma']]
 
 # Combinar os dados em um único DataFrame
 df = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
-
 ####################################################CODIGO DO APP###########################################################################################
 # função que carrega a tabela de queimadas
 @st.cache_data
