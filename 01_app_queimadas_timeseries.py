@@ -15,10 +15,6 @@ import zipfile
 import warnings
 warnings.filterwarnings('ignore')
 
-# configuração da página
-st.set_page_config(layout='wide', initial_sidebar_state='expanded')
-#st.image("logo_queimadas.png", use_column_width=True)
-st.title('Série Temporal de Focos de Calor')
 
 ####################################################DOWNLOAD DOS DADOS###########################################################################################
 # URLs dos dados de queimadas do INPE
@@ -92,6 +88,11 @@ df_2024 = df_2024[['data','lat','lon','municipio','estado','bioma']]
 df_final = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
 
 ####################################################APP###########################################################################################
+
+# configuração da página
+st.set_page_config(layout='wide', initial_sidebar_state='expanded')
+#st.image("logo_queimadas.png", use_column_width=True)
+st.title('Série Temporal de Focos de Calor')
 # função que carrega a tabela de queimadas
 @st.cache_data
 def carregar_dados():
