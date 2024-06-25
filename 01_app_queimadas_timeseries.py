@@ -108,7 +108,7 @@ with st.sidebar:
     estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
 
     # seleciona a "DATA"
-    data_inicial = st.date_input('Digite a data **INICIAL**:', datetime.date(2001, 1, 1))
+    data_inicial = st.date_input('Digite a data **INICIAL**:', datetime.date(2002, 1, 1))
     data_final = st.date_input('Digite a data **FINAL**:')
 
     # filtra por Data
