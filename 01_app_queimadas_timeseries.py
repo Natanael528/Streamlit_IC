@@ -95,7 +95,8 @@ df = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
 @st.cache_data
 def carregar_dados():
     # leitura do dataframe
-    
+    df = pd.read_csv(df)
+
     # insere a coluna data como DateTime no DataFrame
     df['data'] = pd.to_datetime(df['data'])
 
@@ -112,7 +113,7 @@ with st.sidebar:
 
     st.title('Filtros')
     st.divider()
-    #df = carregar_dados()
+    df = carregar_dados()
 
     # seleciona o "ESTADO"
     estados = sorted(df['estado'].unique().tolist())
@@ -198,5 +199,5 @@ col4.plotly_chart(fig_mensal_climatologia, use_container_width=True)
 #print(anual.index.year)
 
 # finalização do APP
-#st.sidebar.divider()
-#st.sidebar.markdown('Desenvolvido por [Prof. Enrique Mattos]("https://github.com/evmpython")')
+st.sidebar.divider()
+st.sidebar.markdown('Desenvolvido por [Prof. Enrique Mattos]("https://github.com/evmpython")')
