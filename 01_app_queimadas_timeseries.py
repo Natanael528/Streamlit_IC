@@ -11,15 +11,16 @@ from bs4 import BeautifulSoup    # Pulling data out of HTML and XML files
 import re                        # Regular expression operations
 import io
 import zipfile
-
 # vamos ignorar vários avisos
 import warnings
 warnings.filterwarnings('ignore')
+
 # configuração da página
 st.set_page_config(layout='wide', initial_sidebar_state='expanded')
 #st.image("logo_queimadas.png", use_column_width=True)
 st.title('Série Temporal de Focos de Calor')
-####################################################CODIGO DE DOWNLOAD DOS DADOS###########################################################################################
+
+####################################################DOWNLOAD DOS DADOS###########################################################################################
 # URLs dos dados de queimadas do INPE
 url_ano_anteriores = 'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/anual/Brasil_sat_ref/' # dados de 2003 - 2023
 url_ano_atual = 'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/' # dados de 2024
@@ -34,7 +35,6 @@ def baixar_dados_zip(url_base):
     for zip_file in zip_files:
         filename = zip_file.get_text()
         url = f'{url_base}{filename}'
-        print("Baixando o arquivo:", filename)
         
         myfile = requests.get(url)
         with zipfile.ZipFile(io.BytesIO(myfile.content)) as z:
@@ -58,7 +58,6 @@ def baixar_dados_csv(url_base):
     for csv_file in csv_files:
         filename = csv_file.get_text()
         url = f'{url_base}{filename}'
-        print("Baixando o arquivo:", filename)
         
         myfile = requests.get(url)
         df = pd.read_csv(io.StringIO(myfile.content.decode('utf-8')), usecols=['lat', 'lon', 'data_hora_gmt', 'satelite', 'municipio', 'estado', 'bioma'])
@@ -79,7 +78,8 @@ df_2024 = df_2024[['data', 'lat', 'lon', 'municipio', 'estado', 'bioma']]
 
 # Combinar os dados em um único DataFrame
 df = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
-####################################################CODIGO DO APP###########################################################################################
+
+####################################################APP###########################################################################################
 # função que carrega a tabela de queimadas
 @st.cache_data
 def carregar_dados():
