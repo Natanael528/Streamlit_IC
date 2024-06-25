@@ -42,7 +42,7 @@ def baixar_dados_zip(url_base):
                 with z.open(file_name) as f:
                     df = pd.read_csv(f)
                     # Renomear colunas específicas se necessário
-                    if 'focos_br_ref_2023.zip' in filename:
+                    if 'focos.zip' in filename:
                         df.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
                     dataframes.append(df)
     
@@ -64,12 +64,11 @@ def baixar_dados_csv(url_base):
         df = pd.read_csv(io.StringIO(myfile.content.decode('utf-8')), usecols=['lat', 'lon', 'data_hora_gmt', 'satelite', 'municipio', 'estado', 'bioma'])
         dataframes.append(df)
     
-    df_total = pd.concat(dataframes, ignore_index=True)
-    return df_total[df_total['satelite'] == 'AQUA_M-T'].drop(columns=['satelite'])
+    df = pd.concat(dataframes, ignore_index=True)
+    return df[df['satelite'] == 'AQUA_M-T'].drop(columns=['satelite'])
 
 # Baixar dados de 2003 a 2023
 df_2003_a_2023 = baixar_dados_zip(url_ano_anteriores)
-df_2003_a_2023.drop(columns=['id_bdq', 'foco_id', 'pais'], inplace=True)
 df_2003_a_2023.rename(columns={'data_pas': 'data'}, inplace=True)
 df_2003_a_2023 = df_2003_a_2023[['data', 'lat', 'lon', 'municipio', 'estado', 'bioma']]
 
@@ -79,34 +78,14 @@ df_2024.rename(columns={'data_hora_gmt': 'data'}, inplace=True)
 df_2024 = df_2024[['data', 'lat', 'lon', 'municipio', 'estado', 'bioma']]
 
 # Combinar os dados em um único DataFrame
-df_total = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
-
-# Processar o DataFrame combinado
-df_total['data'] = pd.to_datetime(df_total['data'])
-df_total.set_index('data', inplace=True)
-df_total['ano'] = df_total.index.year
-df_agrupado = df_total.groupby(['estado', 'ano']).count()['lat']
-
-# Criar o DataFrame de anos por estado
-anos, estados = df_total['ano'].unique(), sorted(df_total['estado'].unique())
-df_estado_ano = pd.DataFrame(index=estados, columns=anos)
-
-# Preencher o DataFrame de anos por estado
-for estado in estados:
-    df_estado_ano.loc[estado] = df_agrupado[estado]
-
-# Exibir o DataFrame final
-#print(df_estado_ano)
-
-# Se precisar salvar os dados em arquivo
-# df_estado_ano.to_csv('focos_estado_ano.csv')
+df = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
 
 ####################################################CODIGO DO APP###########################################################################################
 # função que carrega a tabela de queimadas
 @st.cache_data
 def carregar_dados():
     # leitura do dataframe
-    df = df_estado_ano
+    
     # insere a coluna data como DateTime no DataFrame
     df['data'] = pd.to_datetime(df['data'])
 
