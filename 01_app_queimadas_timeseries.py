@@ -69,24 +69,6 @@ with open('style.css')as f:
 st.logo('ca-130.png',
         link= 'https://meteorologia.unifei.edu.br')
 
-
-# função que carrega a tabela de queimadas
-@st.cache_data
-def carregar_dados():
-    # leitura do dataframe
-    df = pd.read_csv('df.csv')
-
-    # insere a coluna data como DateTime no DataFrame
-    df['data'] = pd.to_datetime(df['data'])
-
-    # seta a coluna data com o index do dataframe
-    df.set_index('data', inplace=True)
-
-    # coloca em ordem crescente de data
-    df = df.sort_values('data')
-    
-    return df
-
 st.title('Série Temporal de Focos de Calor')  
 tab1, tab2 = st.tabs(["Mapa de Distribuição","Tabela" ])
 
