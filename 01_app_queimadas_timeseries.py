@@ -185,7 +185,7 @@ with tab2:
 
 with st.sidebar:
     #botao de download
-    csv = df_filtrado.to_csv(index=False).encode('utf-8')
+    csv = df.to_csv(index=False).encode('utf-8')
     st.download_button("Download CSV",             #Nome do botao
                        csv,                        #Dataset escolhido
                        "dataframe_2003_atual.csv", #Nome pro arquivo
