@@ -8,190 +8,201 @@ import plotly.express as px
 from datetime import datetime, date
 import zipfile
 
-
-##########################################DOWNLOAD#####################################################################
-# URLs dos dados de queimadas do INPE
-url_ano_anteriores = 'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/anual/Brasil_sat_ref/' # dados de 2003 - 2023
-url_ano_atual = 'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/' # dados de 2024
-
-
-#           ANOS ANTERIORES: focos_br_ref_2003.zip	
-
-result = requests.get(url_ano_anteriores)                   # Make the connection
-soup = BeautifulSoup(result.content, 'html.parser')         # Parse the HTML file
-zip_files = soup.find_all('a', href=re.compile("\.zip"))    # Find all "zip" files in the server
-
-df_2003_a_2023 = pd.DataFrame()                             # Create an empty dataframe
-
-for zip_file in zip_files:
-    filename = zip_file.get_text()
-    url = f'{url_ano_anteriores}{filename}'
-    print("O seguinte arquivo será baixado: ", filename)
-
-    # envia uma requisição para a URL especificada
-    myfile = requests.get(url)
-
-    # lê o arquivo zip diretamente em um dataframe
-    with zipfile.ZipFile(io.BytesIO(myfile.content)) as z:
-        for zip_info in z.infolist():
-            with z.open(zip_info) as f:
-                df0 = pd.read_csv(f)
-                # muda o nome da "latitude' para "lat" e "longitude" para "lon" do arquivo de 2023
-                if filename == 'focos_br_ref_2023.zip':
-                    df0.rename(columns={'latitude': 'lat', 'longitude': 'lon'}, inplace=True)
-
-                # junta a tabela que foi lida com a anterior
-                df_2003_a_2023 = pd.concat([df_2003_a_2023, df0], ignore_index=True)
-
-# remove colunas
-df_2003_a_2023.drop(['id_bdq','foco_id','pais'], axis=1, inplace=True)
-
-# renomeia coluna
-df_2003_a_2023.rename(columns={'data_pas': 'data'}, inplace=True)
-
-# reposiciona as colunas
-df_2003_a_2023 = df_2003_a_2023[['data','lat','lon','municipio','estado','bioma']]
-
-# mostra o dataframe
-print(df_2003_a_2023)
+# ==============================================================================================================#
+#                                     DEFINE FUNÇÕES
+# ==============================================================================================================#
+# Cache the conversion to prevent computation on every rerun
+# Função que carrega os dados de focos tabulares
 
 
-#            ANO ATUAL: focos_mensal_br_202401.csv	
+@st.cache_data
+def load_data():
 
-result = requests.get(url_ano_atual)                       
-soup = BeautifulSoup(result.content, 'html.parser')        
-csv_files = soup.find_all('a', href=re.compile("\.csv"))   
+    # leitura do dataframe
+    # df = pd.read_csv(
+    #    'C:/Users/enriq/Downloads/PROCESSAMENTO_PYTHON/dashboards/01_queimadas/focos_br_AQUA_2003_2024.csv', compression='zip')
 
-df_2024 = pd.DataFrame()                                   
+    # lendo todos dataframes
+    df_lat = pd.read_csv(
+        'dados/lat.csv', compression='zip')
+    df_lon = pd.read_csv(
+        'dados/lon.csv', compression='zip')
+    df_municipios = pd.read_csv(
+        'dados/municipios.csv', compression='zip')
+    df_estados = pd.read_csv(
+        'dados/estados.csv', compression='zip')
+    df_biomas = pd.read_csv(
+        'dados/biomas.csv', compression='zip')
 
-for csv_file in csv_files:
-    filename = csv_file.get_text()
-    url = f'{url_ano_atual}{filename}'
-    print("O seguinte arquivo será baixado: ", filename)
+    # junta
+    df = pd.concat([df_lat, df_lon, df_municipios,
+                   df_estados, df_biomas], axis=1)
 
-    # envia uma requisição para a URL especificada
-    myfile = requests.get(url)
+    # insere a coluna data como DateTime no DataFrame
+    df['data'] = pd.to_datetime(df['data'])
 
-    # lê o arquivo csv diretamente em um dataframe
-    df0 = pd.read_csv(io.StringIO(myfile.content.decode('utf-8')), usecols=['lat', 'lon', 'data_hora_gmt', 'satelite', 'municipio', 'estado', 'bioma'])
+    # seta a coluna data com o index do dataframe
+    df.set_index('data', inplace=True)
 
-    # junta a tabela que foi lida com a anterior
-    df_2024 = pd.concat([df_2024, df0], ignore_index=True)
+    # coloca em ordem crescente de data
+    df = df.sort_values('data')
 
-# seleciona para o satélite de referência AQUA_M-T
-df_2024 = df_2024[df_2024['satelite']=='AQUA_M-T']
+    return df
 
-# remove colunas
-df_2024.drop(['satelite'], axis=1, inplace=True)
+# Função que tranforma dataframe para CSV
 
-# renomeia coluna
-df_2024.rename(columns={'data_hora_gmt': 'data'}, inplace=True)
 
-# reposiciona as colunas
-df_2024 = df_2024[['data','lat','lon','municipio','estado','bioma']]
-
-# cria um dataframe combinado
-df_total = pd.concat([df_2003_a_2023, df_2024], ignore_index=True)
-
-df_total['data'] = pd.to_datetime(df_total['data'])
-
-# seta a coluna data com o index do dataframe
-df_total.set_index('data', inplace=True)
-
-# coloca em ordem crescente de data
-df_total.sort_values('data', inplace=True)
-
+@st.cache_data
+def convert_df(df):
+    return df.to_csv(index=False).encode("utf-8")
+    
 ####################################################APP###########################################################
+
+# configuração da página
+st.set_page_config(layout='wide', initial_sidebar_state='expanded')
+
+# load Style css
+with open('style.css')as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
+
+#adiciona logo
+st.logo('ca-130.png',
+        link= 'https://meteorologia.unifei.edu.br')
+
+
+# função que carrega a tabela de queimadas
+@st.cache_data
+def carregar_dados():
+    # leitura do dataframe
+    df = pd.read_csv('df.csv')
+
+    # insere a coluna data como DateTime no DataFrame
+    df['data'] = pd.to_datetime(df['data'])
+
+    # seta a coluna data com o index do dataframe
+    df.set_index('data', inplace=True)
+
+    # coloca em ordem crescente de data
+    df = df.sort_values('data')
+    
+    return df
+
+st.title('Série Temporal de Focos de Calor')  
+tab1, tab2 = st.tabs(["Mapa de Distribuição","Tabela" ])
+
 
 # sidebar
 with st.sidebar:
+
     st.title('Filtros')
     st.divider()
-    
+    df = carregar_dados()
 
     # seleciona o "ESTADO"
-    estados = sorted(df_total['estado'].unique().tolist())
+    estados = sorted(df['estado'].unique().tolist())
     estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
 
     # seleciona a "DATA"
-    data_inicial = st.date_input('Digite a data **INICIAL**:', date(2002, 1, 1))
-    data_final = st.date_input('Digite a data **FINAL**:')
+    data_inicial = st.date_input('Data **INICIAL**:', datetime.date(2024, 1, 1))
+    data_final = st.date_input('Data **FINAL**:')
 
     # filtra por Data
-    df_filtrado = df_total.loc[str(data_inicial):str(data_final)]
+    df_filtrado = df.loc[str(data_inicial):str(data_final)]
 
     # filtra por Estado  
     df_filtrado = df_filtrado[df_filtrado['estado'] == estado_selecionado]
 
-# botão de exibbir gráfico
-#if st.sidebar.button('Exibir Gráfico'):
-    #st.dataframe(df_filtrado, use_container_width=True)
+# Aba do Mapa de Distribuição
+with tab1:
+# Criando o mapa
+    m = folium.Map(location=[-15.7801, -47.9292], zoom_start=4, tiles='cartodbdark_matter')
 
-# mostra o estado
-st.markdown(f'### Estado selecionado = {estado_selecionado}')
+    # Iterando sobre o DataFrame
+    for i, row in df_filtrado.iterrows():
+        folium.CircleMarker(location=[row['lat'], row['lon']],
+                            radius=2,  # Tamanho menor do marcador
+                            fill=True,
+                            color='red',  # Cor vermelha
+                            fill_color='red').add_to(m)  # Cor de preenchimento vermelha
 
-# esta parte será usada para os gráficos
-col1, col2 = st.columns(2)  # Isto significa 2 
-col3, col4 = st.columns(2)  # Isto significa 2 
-# https://plotly.com/python/figure-labels/
+    # Exibindo o mapa com Streamlit
+    st_folium(m, width=1500, height=800)
 
-# DIÁRIO TOTAL
-diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
-fig_diaria = px.line(diaria, width=300, height=300)
-fig_diaria.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor",
-                         title={'text': 'Diária',
-                                'y': 0.93,
-                                'x': 0.5,
-                                'xanchor': 'center',
-                                'yanchor': 'top',
-                                'font_size': 20,
-                                'font_color': 'red'})
-col1.plotly_chart(fig_diaria, use_container_width=True)
+with tab2:
+    # mostra o estado
+    st.markdown(f'### Estado selecionado = {estado_selecionado}')
 
-# ANUAL TOTAL 
-anual = df_filtrado.groupby(pd.Grouper(freq='1YE')).count()['lat']
+    # esta parte será usada para os gráficos
+    col1, col2 = st.columns(2)  # Isto significa 2 
+    col3, col4 = st.columns(2)  # Isto significa 2 
+    # https://plotly.com/python/figure-labels/
 
-fig_anual = px.bar(x=anual.index.year, y=anual.values, width=300, height=300)
+    # DIÁRIO TOTAL
+    diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
+    fig_diaria = px.line(diaria, width=300, height=300)
+    fig_diaria.update_traces(line=dict(color='white'))
+    fig_diaria.update_layout(showlegend=False,  xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor", 
+                            title={'text': 'Diária',
+                                    'y': 0.93,
+                                    'x': 0.5,
+                                    'xanchor': 'center',
+                                    'yanchor': 'top',
+                                    'font_size': 20,
+                                    'font_color': '#FF902A'})
+    col1.plotly_chart(fig_diaria, use_container_width=True)
 
-fig_anual.update_layout(showlegend=False, xaxis_title="Ano", yaxis_title="Quantidade de Focos de Calor",
-                        title={'text': 'Anual',
-                               'y': 0.93,
-                               'x': 0.5,
-                               'xanchor': 'center',
-                               'yanchor': 'top',
-                               'font_size': 20,
-                               'font_color': 'red'})
-col2.plotly_chart(fig_anual, use_container_width=True)
+    # ANUAL TOTAL 
+    anual = df_filtrado.groupby(pd.Grouper(freq='1YE')).count()['lat']
 
-# MENSAL TOTAL
-mensal = df_filtrado.groupby(pd.Grouper(freq='1ME')).count()['lat']
-fig_mensal = px.line(mensal, width=300, height=300)
-fig_mensal.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor",
-                         title={'text': 'Mensal',
-                                'y': 0.93,
-                                'x': 0.5,
-                                'xanchor': 'center',
-                                'yanchor': 'top',
-                                'font_size': 20,
-                                'font_color': 'red'})
-col3.plotly_chart(fig_mensal, use_container_width=True)
+    fig_anual = px.bar(x=anual.index.year, y=anual.values, width=300, height=300)
 
-# MENSAL MÉDIO
-mensal_climatologia = mensal.groupby(mensal.index.month).mean()
-fig_mensal_climatologia = px.bar(mensal_climatologia, width=300, height=300)
-fig_mensal_climatologia.update_layout(showlegend=False, xaxis_title="Mês", yaxis_title="Quantidade de Focos de Calor",
-                                      title={'text': 'Mensal Média',
-                                             'y': 0.93,
-                                             'x': 0.5,
-                                             'xanchor': 'center',
-                                             'yanchor': 'top',
-                                             'font_size': 20,
-                                             'font_color': 'red'})
-col4.plotly_chart(fig_mensal_climatologia, use_container_width=True)
+    fig_anual.update_layout(showlegend=False, xaxis_title="Ano", yaxis_title="Quantidade de Focos de Calor", 
+                            title={'text': 'Anual',
+                                  'y': 0.93,
+                                  'x': 0.5,
+                                  'xanchor': 'center',
+                                  'yanchor': 'top',
+                                  'font_size': 20,
+                                  'font_color': '#FF902A'})
+    col2.plotly_chart(fig_anual, use_container_width=True)
 
-#print(anual)
-#print(anual.index.year)
+    # MENSAL TOTAL
+    mensal = df_filtrado.groupby(pd.Grouper(freq='1ME')).count()['lat']
+    fig_mensal = px.line(mensal, width=300, height=300)
+    fig_mensal.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor", 
+                            title={'text': 'Mensal',
+                                    'y': 0.93,
+                                    'x': 0.5,
+                                    'xanchor': 'center',
+                                    'yanchor': 'top',
+                                    'font_size': 20,
+                                    'font_color': '#FF902A'})
+    col3.plotly_chart(fig_mensal, use_container_width=True)
+        
+    # MENSAL MÉDIO
+    mensal_climatologia = mensal.groupby(mensal.index.month).mean()
+    fig_mensal_climatologia = px.bar(mensal_climatologia, width=300, height=300)
+    fig_mensal_climatologia.update_layout(showlegend=False, xaxis_title="Mês", yaxis_title="Quantidade de Focos de Calor", 
+                            title={'text': 'Mensal Média',
+                                    'y': 0.93,
+                                    'x': 0.5,
+                                    'xanchor': 'center',
+                                    'yanchor': 'top',
+                                    'font_size': 20,
+                                    'font_color': '#FF902A'})
+    col4.plotly_chart(fig_mensal_climatologia, use_container_width=True)
+
+
+
+with st.sidebar:
+    #botao de download
+    csv = df_filtrado.to_csv(index=False).encode('utf-8')
+    st.download_button("Download CSV",             #Nome do botao
+                       csv,                        #Dataset escolhido
+                       "dataframe_2003_atual.csv", #Nome pro arquivo
+                       "text/csv")                 #Informação do dataset
+
+
 
 # finalização do APP
 st.sidebar.divider()
-st.sidebar.markdown('Desenvolvido por [Prof. Enrique Mattos]("https://github.com/evmpython")')
