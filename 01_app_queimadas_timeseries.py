@@ -78,7 +78,6 @@ with st.sidebar:
 
     st.title('Filtros')
     st.divider()
-    df = carregar_dados()
 
     # seleciona o "ESTADO"
     estados = sorted(df['estado'].unique().tolist())
