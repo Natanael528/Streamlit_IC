@@ -1,3 +1,4 @@
 streamlit
 plotly
 bs4
+streamlit_folium
