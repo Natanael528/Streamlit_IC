@@ -7,6 +7,13 @@ import streamlit as st
 import plotly.express as px
 from datetime import datetime, date
 import zipfile
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import datetime
+from streamlit_folium import st_folium
+import folium
+import numpy as np
 
 # ==============================================================================================================#
 #                                     DEFINE FUNÇÕES
