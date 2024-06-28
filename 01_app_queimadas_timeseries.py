@@ -72,7 +72,8 @@ st.logo('ca-130.png',
 st.title('Série Temporal de Focos de Calor')  
 tab1, tab2 = st.tabs(["Mapa de Distribuição","Tabela" ])
 
-
+#carrega o dataframe
+df = load_data()
 # sidebar
 with st.sidebar:
 
