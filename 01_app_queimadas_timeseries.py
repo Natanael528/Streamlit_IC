@@ -73,7 +73,7 @@ with open('style.css')as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
 
 #adiciona logo
-st.logo('cropped-simbolo_RGB.png',
+st.logo('ca-130.png',
         link= 'https://meteorologia.unifei.edu.br')
 
 st.title('Série Temporal de Focos de Calor')  
