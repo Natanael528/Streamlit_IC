@@ -96,7 +96,7 @@ h3 {
 
 /*##### Gráficos ####*/
 .st-emotion-cache-ocqkz7 .main-svg {
-    background: transparent !important;
+    background: rgba(56, 56, 56, 0.158) !important;
 }
 .st-emotion-cache-ocqkz7 .main-svg .gtitle {
     fill: #fff !important;
@@ -105,7 +105,7 @@ h3 {
     fill: #fff !important;
 }
 .st-emotion-cache-ocqkz7 .main-svg .cartesianlayer .plot .lines path {
-    stroke: #fff !important;
+    stroke: #ffffff !important;
 }
 
 
