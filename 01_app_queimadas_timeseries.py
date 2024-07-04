@@ -25,10 +25,6 @@ import numpy as np
 @st.cache_data
 def load_data():
 
-    # leitura do dataframe
-    # df = pd.read_csv(
-    #    'C:/Users/enriq/Downloads/PROCESSAMENTO_PYTHON/dashboards/01_queimadas/focos_br_AQUA_2003_2024.csv', compression='zip')
-
     # lendo todos dataframes
     df_lat = pd.read_csv(
         'dados/lat.csv', compression='zip')
@@ -43,7 +39,7 @@ def load_data():
     
     df_lat['lat'] = df_lat['lat'] / 10000
     df_lon['lon'] = df_lon['lon'] / 10000
-
+    
     # junta
     df = pd.concat([df_lat, df_lon, df_municipios,
                    df_estados, df_biomas], axis=1)
@@ -58,8 +54,6 @@ def load_data():
     df = df.sort_values('data')
 
     return df
-
-# Função que tranforma dataframe para CSV
 
 
 @st.cache_data
@@ -106,6 +100,27 @@ with st.sidebar:
 
 # Aba do Mapa de Distribuição
 with tab1:
+    # from leafmap import leafmap
+    # m = leafmap.Map()
+    # m.add_markers(
+    # markers=[[40, -100], [35, -110]],
+    # shape="circle",
+    # radius=20,
+    # color="red",
+    # fill_color="#3388ff",
+    # fill_opacity=0.5)
+    # m.to_streamlit(width=1500, height=800)
+
+
+
+
+
+
+
+
+
+
+
 # Criando o mapa
     m = folium.Map(location=[-15.7801, -47.9292], zoom_start=4, tiles='cartodbdark_matter')
 
@@ -127,7 +142,6 @@ with tab2:
     # esta parte será usada para os gráficos
     col1, col2 = st.columns(2)  # Isto significa 2 
     col3, col4 = st.columns(2)  # Isto significa 2 
-    # https://plotly.com/python/figure-labels/
 
     # DIÁRIO TOTAL
     diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
