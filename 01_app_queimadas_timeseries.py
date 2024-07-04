@@ -40,6 +40,9 @@ def load_data():
         'dados/estados.csv', compression='zip')
     df_biomas = pd.read_csv(
         'dados/biomas.csv', compression='zip')
+    
+    df_lat['lat'] = df_lat['lat'] / 10000
+    df_lon['lon'] = df_lon['lon'] / 10000
 
     # junta
     df = pd.concat([df_lat, df_lon, df_municipios,
