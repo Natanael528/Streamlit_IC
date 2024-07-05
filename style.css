@@ -50,6 +50,27 @@
     border-color: #ff912a4f;
 }
 
+
+/*barra seleção*/
+
+.st-ce.st-b4.st-b3.st-b1.st-ag.st-as.st-cf{
+    width: auto ;
+}
+
+.st-cg.st-ch.st-ci.st-cj.st-eq.st-cl.st-cd.st-cm.st-cn {
+    background: linear-gradient(to right, #21252900 0%, #ff902a, #000 42.8571%, #FF902A 100%);
+}
+
+.st-emotion-cache-1vzeuhh {
+    background-color: #FF902A;
+}
+.st-emotion-cache-10y5sf6 {
+    font-family: "Source Sans Pro", monospace;
+    font-size: 14px;
+    color: #FF902A;
+}
+
+
 /*########## Detalhe calendário ##########*/
 .st-gz {
     transform: translate3d(0, 0, 0);
@@ -102,17 +123,17 @@ h3 {
 
 /*##### Gráficos ####*/
 .st-emotion-cache-ocqkz7 .main-svg {
-    background: rgba(56, 56, 56, 0.158) !important;
-    border-radius: 1rem;
+    background: #a1a1a121;
+    border-radius: 1.5rem;
 }
 .st-emotion-cache-ocqkz7 .main-svg .gtitle {
-    fill: #fff !important;
+    fill: white !important;
 }
 .st-emotion-cache-ocqkz7 .main-svg .plot .trace.bars .points path {
-    fill: #fff !important;
+    fill: #F11965 !important;
 }
 .st-emotion-cache-ocqkz7 .main-svg .cartesianlayer .plot .lines path {
-    stroke: #ffffff !important;
+    stroke: #F11965 !important;
 }
 
 
@@ -134,4 +155,12 @@ h3 {
 
 .tab-content {
     margin-top: 0px;
+}
+
+
+/*cor da barra de edit do leafmap*/
+.leaflet-bar a {
+    background-color: #fff0;
+    border-bottom: 1px solid #fff0;
+    color: white;
 }
