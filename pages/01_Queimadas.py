@@ -60,13 +60,11 @@ def load_data():
 @st.cache_data
 def convert_df(df):
     return df.to_csv(index=False)
-
-
-    
-####################################################APP###########################################################
+  
+###############################################################################################################
 
 # configuração da página
-st.set_page_config(layout='wide', initial_sidebar_state='expanded')
+st.set_page_config(layout='wide', initial_sidebar_state='collapsed')
 
 # load Style css
 with open('style.css')as f:
@@ -81,20 +79,16 @@ tab1, tab2 ,tab3 = st.tabs(["Mapa maiores ocorrencias", 'Localização',"Tabela"
 
 #carrega o dataframe
 df,df2 = load_data()
-with st.sidebar:
-    st.title('Filtros')
+
+
+
+with tab1:
     
     # Seleção do ano
     anos_disponiveis = sorted(df2['ano'].unique())
-    ano_selecionado = st.selectbox('Selecione o Ano:', anos_disponiveis)
-
-# Filtrar por estado e ano selecionado
-df2_filtrado = df2[(df2['ano'] == ano_selecionado)]
-
-df2
-
-with tab1:
-
+    ano_selecionado = st.select_slider('Selecione o Ano:', options=anos_disponiveis, value=anos_disponiveis[0])
+    df2_filtrado = df2[(df2['ano'] == ano_selecionado)]
+    
     m = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
     m.add_heatmap(
         df2_filtrado,
@@ -102,9 +96,9 @@ with tab1:
         longitude="lon",
         value="queimadas",
         name="Heat map",
-        radius=50,
+        radius=40,
     )
-    m.to_streamlit(width=1500, height=800)
+    m.to_streamlit(width=1750, height=700)
 
 
 
@@ -113,7 +107,6 @@ with tab1:
 with st.sidebar:
 
     st.title('Filtros')
-
     # seleciona o "ESTADO"
     estados = sorted(df['estado'].unique().tolist())
     estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
@@ -130,9 +123,9 @@ with st.sidebar:
 
 
 
-# mAba do Mapa de Distribuição
+# Aba do Mapa de Distribuição
 with tab2: 
-# Criando o mapa
+
     m = folium.Map(location=[-15.7801, -47.9292], zoom_start=4, tiles='cartodbdark_matter')
 
     # Iterando sobre o DataFrame
@@ -145,7 +138,7 @@ with tab2:
 
     # Exibindo o mapa com Streamlit
     st_folium(m, width=1500, height=800)
-    
+
     
     
 
@@ -161,7 +154,7 @@ with tab3:
     # DIÁRIO TOTAL
     diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
     fig_diaria = px.line(diaria, width=300, height=300)
-    fig_diaria.update_traces(line=dict(color='white'))
+    fig_diaria.update_traces(line=dict(color='#F11965'))
     fig_diaria.update_layout(showlegend=False,  xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor", 
                             title={'text': 'Diária',
                                     'y': 0.93,
@@ -169,7 +162,7 @@ with tab3:
                                     'xanchor': 'center',
                                     'yanchor': 'top',
                                     'font_size': 20,
-                                    'font_color': '#FF902A'})
+                                    'font_color': 'white'})
     col1.plotly_chart(fig_diaria, use_container_width=True)
 
     # ANUAL TOTAL 
@@ -184,7 +177,7 @@ with tab3:
                                   'xanchor': 'center',
                                   'yanchor': 'top',
                                   'font_size': 20,
-                                  'font_color': '#FF902A'})
+                                  'font_color': 'white'})
     col2.plotly_chart(fig_anual, use_container_width=True)
 
     # MENSAL TOTAL
@@ -197,7 +190,7 @@ with tab3:
                                     'xanchor': 'center',
                                     'yanchor': 'top',
                                     'font_size': 20,
-                                    'font_color': '#FF902A'})
+                                    'font_color': 'white'})
     col3.plotly_chart(fig_mensal, use_container_width=True)
         
     # MENSAL MÉDIO
@@ -210,7 +203,7 @@ with tab3:
                                     'xanchor': 'center',
                                     'yanchor': 'top',
                                     'font_size': 20,
-                                    'font_color': '#FF902A'})
+                                    'font_color': 'white'})
     col4.plotly_chart(fig_mensal_climatologia, use_container_width=True)
 
 
