@@ -36,6 +36,12 @@
     background-color: transparent;
     border-color: #ff912a4f;
 }
+
+.st-emotion-cache-j7qwjs {
+    display: flex;
+    flex-direction: unset;
+}
+
 .st-cf, .st-d1 {
     width: 80%;
 }
@@ -97,6 +103,7 @@ h3 {
 /*##### Gráficos ####*/
 .st-emotion-cache-ocqkz7 .main-svg {
     background: rgba(56, 56, 56, 0.158) !important;
+    border-radius: 1rem;
 }
 .st-emotion-cache-ocqkz7 .main-svg .gtitle {
     fill: #fff !important;
