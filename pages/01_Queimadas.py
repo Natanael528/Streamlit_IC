@@ -81,7 +81,7 @@ tab1, tab2 ,tab3 = st.tabs(["Mapa maiores ocorrencias", 'Localização',"Tabela"
 df,df2 = load_data()
 
 
-df_filtrado
+
 with tab1:
     
     # Seleção do ano
