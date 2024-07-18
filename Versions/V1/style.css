@@ -1,0 +1,166 @@
+/* ####tamanho da logo######### */
+[alt=Logo] {
+    height: 4rem;
+}
+
+/*#####tirar os botoes da lateral######*/
+.stDeployButton > button,
+#MainMenu,
+.st-emotion-cache-14x9thb > button,
+.st-emotion-cache-4z1n4l > img,
+.st-emotion-cache-4z1n4l > label {
+    visibility: hidden;
+}
+
+/*####alterar cor do background da barra lateral######*/
+.st-emotion-cache-1itdyc2 {
+    background: linear-gradient(90deg, #1C1C1C 85.94%, rgba(28, 28, 28, 0) 100%);
+}
+.st-emotion-cache-h4xjwg {
+    background: #262626 !important;
+}
+.st-emotion-cache-1dp5vir {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 0.125rem;
+    background-image: linear-gradient(90deg, #212121, #FF902A, #212121);
+    z-index: 999990;
+}
+
+/*########## Botões ##########*/
+.row-widget.stDownloadButton button,
+.st-emotion-cache-17ow6m6:focus:not(:active) {
+    color: #FF902A;
+    background-color: transparent;
+    border-color: #ff912a4f;
+}
+
+.st-emotion-cache-j7qwjs {
+    display: flex;
+    flex-direction: unset;
+}
+
+.st-cf, .st-d1 {
+    width: 80%;
+}
+.st-d1 {
+    background-color: #262626;
+    border-color: #ff912a4f;
+}
+
+
+/*barra seleção*/
+
+.st-ce.st-b4.st-b3.st-b1.st-ag.st-as.st-cf{
+    width: auto ;
+}
+
+.st-cg.st-ch.st-ci.st-cj.st-eq.st-cl.st-cd.st-cm.st-cn {
+    background: linear-gradient(to right, #21252900 0%, #ff902a, #000 42.8571%, #FF902A 100%);
+}
+
+.st-emotion-cache-1vzeuhh {
+    background-color: #FF902A;
+}
+.st-emotion-cache-10y5sf6 {
+    font-family: "Source Sans Pro", monospace;
+    font-size: 14px;
+    color: #FF902A;
+}
+
+
+/*########## Detalhe calendário ##########*/
+.st-gz {
+    transform: translate3d(0, 0, 0);
+}
+.st-gz:hover {
+    color: #FF902A;
+}
+.st-de::after {
+    background-color: #FF902A;
+}
+
+/* ##### Background da página ####### */
+.st-emotion-cache-13k62yr {
+    position: absolute;
+    background: #262626;
+    color: #fff;
+    inset: 0;
+    color-scheme: dark;
+    overflow: hidden;
+}
+
+/* ############# Opções (tabela, mapa...) ############ */
+.st-bd {
+    color: #FF902A !important;
+    transition: 0.5s;
+}
+.st-c2 {
+    background-color: #FF902A;
+}
+.st-bn:hover {
+    color: #FF902A;
+}
+
+/*######### Títulos #########*/
+h1 {
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 700;
+    color: #fff;
+    padding: 0 0 1rem;
+    margin: 0;
+    line-height: 0;
+}
+h3 {
+    font-size: 1.17em;
+    color: #FF902A;
+    margin: 1em 0;
+    font-weight: bold;
+    unicode-bidi: isolate;
+}
+
+/*##### Gráficos ####*/
+.st-emotion-cache-ocqkz7 .main-svg {
+    background: #a1a1a121;
+    border-radius: 1.5rem;
+}
+.st-emotion-cache-ocqkz7 .main-svg .gtitle {
+    fill: white !important;
+}
+.st-emotion-cache-ocqkz7 .main-svg .plot .trace.bars .points path {
+    fill: #F11965 !important;
+}
+.st-emotion-cache-ocqkz7 .main-svg .cartesianlayer .plot .lines path {
+    stroke: #F11965 !important;
+}
+
+
+
+
+#map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+#map-container .folium-map {
+    width: 100%;
+    height: 100%;
+}
+
+.tab-content {
+    margin-top: 0px;
+}
+
+
+/*cor da barra de edit do leafmap*/
+.leaflet-bar a {
+    background-color: #fff0;
+    border-bottom: 1px solid #fff0;
+    color: white;
+}
