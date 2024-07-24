@@ -1,1 +1,1 @@
-# Streamlit_IC
+# Explore informações detalhadas sobre focos de queimadas no Brasil com nossos dashboards interativos. Acompanhe os focos recentes, analise climatologias e visualize séries temporais de dados sobre incêndios florestais em todo o país. Nosso projeto oferece uma visão abrangente e atualizada, facilitando a compreensão e monitoramento dos impactos das queimadas no meio ambiente brasileiro.
