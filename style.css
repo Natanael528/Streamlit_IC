@@ -14,7 +14,7 @@
 
 /*####alterar cor do background da barra lateral######*/
 .st-emotion-cache-1itdyc2 {
-    background: linear-gradient(90deg, #1c1c1c 85.94%, rgba(28, 28, 28, 0) 100%);
+    background: linear-gradient(90deg, #1c1c1c 85.94%, rgba(28, 28, 28, 0) 100%) !important;
 }
 .st-emotion-cache-h4xjwg {
     background: #262626 !important;
@@ -38,15 +38,15 @@
 } */
 
 .st-emotion-cache-j7qwjs { /*tamanho da caixa de seleção*/
-    display: flex;
-    flex-direction: unset;
+    display: flex !important;
+    flex-direction: unset !important;
 }
 
 .st-cf, .st-d1 {
-    width: 80%;
+    width: 80% !important;
 }
 .st-emotion-cache-t2bj6i {
-    width: 87%;
+    width: 87% !important;
 }
 
 /* .st-d1 {
@@ -56,14 +56,14 @@
 
 
 /* ##### Background da página ####### */
-.st-emotion-cache-13k62yr {
+/* .st-emotion-cache-13k62yr {
     position: absolute;
     background: #262626;
     color: #fff;
     inset: 0;
     color-scheme: dark;
     overflow: hidden;
-}
+} */
 
 /*##### Gráficos ####*/
 .st-emotion-cache-ocqkz7 .main-svg,
