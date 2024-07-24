@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import leafmap.foliumap as leafmap
-import pytz
+
 
 st.set_page_config(layout='wide',
                    page_icon=':fire:',
@@ -58,14 +58,14 @@ if periodo == 'Ultimas 24 Horas':
         dfiltrado = df 
     # df1
     
-    # Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
-    # Map.add_points_from_xy(dfiltrado, x="lon", y="lat",value = 'frp', radius= 20)             #NAO FUNCIONA :(
-    # Map.to_streamlit(height=700)
+    Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
+    Map.add_points_from_xy(dfiltrado, x="lon", y="lat",value = 'frp', radius= 20)             #NAO FUNCIONA :(
+    Map.to_streamlit(height=700)
     
 
-    Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
-    Map.add_heatmap(dfiltrado, latitude="lat", longitude="lon",value = 'frp', radius= 10)
-    Map.to_streamlit(width=1350, height=700)
+    # Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
+    # Map.add_heatmap(dfiltrado, latitude="lat", longitude="lon",value = 'frp', radius= 10)
+    # Map.to_streamlit(width=1350, height=700)
 
 else:
     
