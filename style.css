@@ -30,29 +30,20 @@
 }
 
 /*########## Botões ##########*/
-/* .row-widget.stDownloadButton button,
-.st-emotion-cache-17ow6m6:focus:not(:active) {
-    color: #FF902A;
-    background-color: transparent;
-    border-color: #ff912a4f;
-} */
+
 
 .st-emotion-cache-j7qwjs { /*tamanho da caixa de seleção*/
     display: flex !important;
     flex-direction: unset !important;
 }
 
-.st-cf, .st-d1 {
-    width: 80% !important;
-}
-.st-emotion-cache-t2bj6i {
-    width: 87% !important;
+.row-widget.stSelectbox{
+   width: 170px !important;
 }
 
-/* .st-d1 {
-    background-color: #262626;
-    border-color: #ff912a4f;
-} */
+.st-emotion-cache-1tuwfdi {
+    width: 61% !important;
+}
 
 
 /* ##### Background da página ####### */
@@ -75,11 +66,11 @@
     fill: white !important;
 }
 .st-emotion-cache-ocqkz7 .main-svg .plot .trace.bars .points path {
-    fill: #F11965 !important;
+    fill: #FF902A !important;
 }
 .st-emotion-cache-ocqkz7 .main-svg .cartesianlayer .plot .lines path {
-    stroke: #F11965 !important;
+    stroke: #FF902A !important;
 }
 .st-emotion-cache-9aoz2h .main-svg .plot .trace.bars .points path {
-    fill: #F11965 !important;
+    fill: #FF902A !important;
 }

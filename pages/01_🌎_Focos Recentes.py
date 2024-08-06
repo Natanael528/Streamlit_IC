@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from streamlit_folium import st_folium
+import folium
 import leafmap.foliumap as leafmap
 
 
@@ -37,7 +39,7 @@ def load_data():
 
 
 with st.sidebar:
-    periodo = st.radio('Selecione o Período do dado', ['Mês Atual', 'Ultimas 24 Horas'])
+    periodo = st.radio('Selecione o Período do dado', ['Mensal Atual', 'Ultimas 24 Horas'])
 
 
 if periodo == 'Ultimas 24 Horas':
@@ -47,7 +49,8 @@ if periodo == 'Ultimas 24 Horas':
     df1 = load_data()
     
     data = df1.groupby(pd.Grouper(freq='1H')).count()['lat'].tail(24).index     #filtra por hora e seleciona as ultimas 24horas 
-    df = df1[df1.index.floor('H').isin(data)]                                   #floor('H') acha o valor no index mais proximo da data filtrada, isin filtra o index atras dos valores do filtro anterior
+    df = df1[df1.index.floor('1H').isin(data)]                                   #floor('H') acha o valor no index mais proximo da data filtrada, isin filtra o index atras dos valores do filtro anterior
+    
     
     on = st.sidebar.toggle("Selecionar o satelite")
     if on:      
@@ -56,16 +59,14 @@ if periodo == 'Ultimas 24 Horas':
         dfiltrado = df[df['satelite'] == selec]
     else:
         dfiltrado = df 
-    # df1
+
+    
+    #teste leafmap
     
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(dfiltrado, x="lon", y="lat",value = 'frp', radius= 10)             #NAO FUNCIONA :(
+    Map.add_points_from_xy(dfiltrado, x="lon", y="lat", layer_name="Marcadores")             #NAO FUNCIONA :(
+    Map.add_heatmap(dfiltrado, latitude="lat", longitude="lon",value = 'frp', radius= 13, layer_name = 'HeatMap')
     Map.to_streamlit(width=1350, height=700)
-    
-
-    # Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
-    # Map.add_heatmap(dfiltrado, latitude="lat", longitude="lon",value = 'frp', radius= 10)
-    # Map.to_streamlit(width=1350, height=700)
 
 else:
     
@@ -86,9 +87,10 @@ else:
         dfiltrado = df[df['satelite'] == selec]
     else:
         dfiltrado = df  
-    
-    
+
+
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
-    Map.add_heatmap(dfiltrado, latitude="lat", longitude="lon",value = 'frp', radius= 13)
-    Map.to_streamlit(width=1350, height=700)    
+    Map.add_points_from_xy(dfiltrado, x="lon", y="lat", layer_name="Marcadores")             #NAO FUNCIONA :(
+    Map.add_heatmap(dfiltrado, latitude="lat", longitude="lon",value = 'frp', radius= 13, layer_name = 'HeatMap')
+    Map.to_streamlit(width=1350, height=700)
 
