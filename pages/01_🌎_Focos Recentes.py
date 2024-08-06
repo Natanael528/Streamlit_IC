@@ -64,8 +64,7 @@ if periodo == 'Ultimas 24 Horas':
     #teste leafmap
     
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(dfiltrado, x="lon", y="lat", layer_name="Marcadores")             #NAO FUNCIONA :(
-    Map.add_heatmap(dfiltrado, latitude="lat", longitude="lon",value = 'frp', radius= 13, layer_name = 'HeatMap')
+    Map.add_points_from_xy(dfiltrado, x="lon", y="lat", layer_name="Marcadores") 
     Map.to_streamlit(width=1350, height=700)
 
 else:
@@ -91,6 +90,5 @@ else:
 
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
     Map.add_points_from_xy(dfiltrado, x="lon", y="lat", layer_name="Marcadores")             #NAO FUNCIONA :(
-    Map.add_heatmap(dfiltrado, latitude="lat", longitude="lon",value = 'frp', radius= 13, layer_name = 'HeatMap')
     Map.to_streamlit(width=1350, height=700)
 
