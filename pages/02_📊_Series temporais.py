@@ -96,7 +96,7 @@ col5,col6,col7 = st.columns(3)
 # DIÁRIO TOTAL
 diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
 fig_diaria = px.line(diaria, width=300, height=300)
-fig_diaria.update_traces(line=dict(color='#F11965'))
+fig_diaria.update_traces(line=dict(color='#FF902A'))
 fig_diaria.update_layout(showlegend=False,  xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor", 
                         title={'text': 'Diária',
                                 'y': 0.93,
