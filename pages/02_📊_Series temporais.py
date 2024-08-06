@@ -51,6 +51,7 @@ with st.sidebar:
         
         # seleciona a "DATA"
         anos_disponiveis = sorted(df.index.year.unique())
+        st.sidebar.divider()
         data_inicial = st.selectbox('Ano inicial', anos_disponiveis)
         data_final = st.selectbox('Ano final', anos_disponiveis)
         # filtra por Data
@@ -63,6 +64,7 @@ with st.sidebar:
     else:
         # seleciona o "ESTADO"
         estados = sorted(df['estado'].unique().tolist())
+        st.sidebar.divider()
         estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
 
         # seleciona a "DATA"
