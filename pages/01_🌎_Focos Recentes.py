@@ -51,14 +51,14 @@ if periodo == 'Ultimas 24 Horas':
     data = df1.groupby(pd.Grouper(freq='1H')).count()['lat'].tail(24).index     #filtra por hora e seleciona as ultimas 24horas 
     df = df1[df1.index.floor('1H').isin(data)]                                   #floor('H') acha o valor no index mais proximo da data filtrada, isin filtra o index atras dos valores do filtro anterior
     
-    
-    on = st.sidebar.toggle("Selecionar o satelite")
+    st.sidebar.divider()
+    on = st.sidebar.toggle("Todos os Satelites")
     if on:      
-        sat = df.satelite.unique().tolist() 
-        selec = st.sidebar.selectbox('Satelite',sat)
-        dfiltrado = df[df['satelite'] == selec]
+        dfiltrado = df  
     else:
-        dfiltrado = df 
+        sat = df.satelite.unique().tolist() 
+        selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= 11)
+        dfiltrado = df[df['satelite'] == selec]
 
     
     #teste leafmap
@@ -75,18 +75,18 @@ else:
     df1 = load_data()
     
     data = df1.groupby(pd.Grouper(freq='1D')).count()['lat'].index
-    
-    dataselec = st.sidebar.selectbox('selecione o dia', options= data)
+    st.sidebar.divider()
+    dataselec = st.sidebar.selectbox('Selecione o dia', options= data)
 
     df = df1[df1.index.floor('D').isin([dataselec])]                 
    
-    on = st.sidebar.toggle("Selecionar o satelite")
+    on = st.sidebar.toggle("Todos os Satelites")
     if on:      
-        sat = df.satelite.unique().tolist() 
-        selec = st.sidebar.selectbox('Satelite',sat)
-        dfiltrado = df[df['satelite'] == selec]
-    else:
         dfiltrado = df  
+    else:
+        sat = df.satelite.unique().tolist() 
+        selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= 11)
+        dfiltrado = df[df['satelite'] == selec]
 
 
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')

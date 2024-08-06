@@ -14,7 +14,7 @@
 
 /*####alterar cor do background da barra lateral######*/
 .st-emotion-cache-1itdyc2 {
-    background: linear-gradient(90deg, #1c1c1c 85.94%, rgba(28, 28, 28, 0) 100%) !important;
+    background: linear-gradient(90deg, #1c1c1c 55.94%, rgba(28, 28, 28, 0) 100%) !important;
 }
 .st-emotion-cache-h4xjwg {
     background: #262626 !important;
@@ -42,9 +42,14 @@
 }
 
 .st-emotion-cache-1tuwfdi {
-    width: 61% !important;
+    width: 207px !important;
+    position: fixed;
 }
 
+.stMarkdown .st-emotion-cache-1sno8jx.e1nzilvr4{
+    width: 231px !important;
+    margin-left: -50px !important;
+}
 
 /* ##### Background da página ####### */
 .st-emotion-cache-13k62yr {
