@@ -51,6 +51,7 @@ with st.sidebar:
         
         # seleciona a "DATA"
         anos_disponiveis = sorted(df.index.year.unique())
+
         st.sidebar.divider()
         data_inicial = st.selectbox('Ano inicial', anos_disponiveis)
         data_final = st.selectbox('Ano final', anos_disponiveis)
@@ -68,7 +69,7 @@ with st.sidebar:
         estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
 
         # seleciona a "DATA"
-        data_inicial = st.date_input('Data **INICIAL**:', datetime.date(2024, 1, 1))
+        data_inicial = st.date_input('Data **INICIAL**:', datetime.date(2003, 1, 1)) #setar minimo 
         data_final = st.date_input('Data **FINAL**:')
 
         # filtra por Data
@@ -77,8 +78,6 @@ with st.sidebar:
         # filtra por Estado  
         df_filtrado = df_filtrado[df_filtrado['estado'] == estado_selecionado]
         
-        # filtra novo df para os tops 10 e 5 com base em um ano apenas
-        df_filtrado2 = df_filtrado.loc[str(data_final):str(data_final)]
         
 
 # mostra o estado
@@ -92,7 +91,7 @@ else:
 # esta parte será usada para os gráficos
 col1, col2 = st.columns(2)  # Isto significa 2 
 col3, col4 = st.columns(2)  # Isto significa 2 
-col5,col6,col7 = st.columns(3)
+col5, col6 = st.columns(2)
 # DIÁRIO TOTAL
 diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
 fig_diaria = px.line(diaria, width=300, height=300)
@@ -135,10 +134,10 @@ fig_mensal.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="
 col3.plotly_chart(fig_mensal, use_container_width=True)
     
 # MENSAL MÉDIO
-mensal_climatologia = mensal.groupby(mensal.index.month).mean()
+mensal_climatologia = mensal.groupby(mensal.index.month).sum() #sum
 fig_mensal_climatologia = px.bar(mensal_climatologia, width=300, height=300)
 fig_mensal_climatologia.update_layout(showlegend=False, xaxis_title="Mês", yaxis_title="Quantidade de Focos de Calor", 
-                        title={'text': 'Mensal Média',
+                        title={'text': 'Soma focos Mensais',
                                 'y': 0.93,
                                 'x': 0.5,
                                 'xanchor': 'center',
@@ -150,15 +149,15 @@ col4.plotly_chart(fig_mensal_climatologia, use_container_width=True)
 if rad == 'Brasil todo':
     
 #focos por municipio
-    df_filtrado2['ano'] = df_filtrado2.index.year
-    queimadas_por_municipio = df_filtrado2.groupby(['ano', 'municipio']).size().reset_index(name='num_queimadas')
+    df_filtrado['ano'] = df_filtrado.index.year
+    queimadas_por_municipio = df_filtrado.groupby(['municipio']).size().reset_index(name='num_queimadas')
     top10municipio = queimadas_por_municipio.nlargest(10, 'num_queimadas')
-    anoo = top10municipio['ano'].unique()
+    anoo = df_filtrado['ano'].unique()
     
     fig_max_municipio = px.bar(
-        top10municipio, x='municipio', y='num_queimadas', width=300, height=300)
+        top10municipio, y='municipio', x='num_queimadas', width=300, height=300)
     
-    fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municipios {anoo}',
+    fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municipios {anoo.min()} até {anoo.max()}',
                'y': 0.93,
                'x': 0.5,
                'xanchor': 'center',
@@ -170,14 +169,15 @@ if rad == 'Brasil todo':
 
 
 #focos por estado
-    df_filtrado2['ano'] = df_filtrado2.index.year
-    queimadas_por_estado = df_filtrado2.groupby(['ano', 'estado']).size().reset_index(name='num_queimadas')
+    df_filtrado['ano'] = df_filtrado.index.year
+    queimadas_por_estado = df_filtrado.groupby(['estado']).size().reset_index(name='num_queimadas')
     top10estados = queimadas_por_estado.nlargest(10, 'num_queimadas')
+    anoo = df_filtrado['ano'].unique()
     
     fig_max_estado = px.bar(
-        top10estados, x='estado', y='num_queimadas', width=300, height=300)
+        top10estados, y='estado', x='num_queimadas', width=300, height=300)
     
-    fig_max_estado.update_layout(showlegend=False, xaxis_title="Estado", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Estados {anoo}',
+    fig_max_estado.update_layout(showlegend=False, xaxis_title="Estado", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Estados {anoo.min()} até {anoo.max()}',
                'y': 0.93,
                'x': 0.5,
                'xanchor': 'center',
@@ -188,34 +188,37 @@ if rad == 'Brasil todo':
 
 
 #focos por bioma
-    df_filtrado2['ano'] = df_filtrado2.index.year
-    queimadas_por_bioma = df_filtrado2.groupby(['ano', 'bioma']).size().reset_index(name='num_queimadas')
+
+    df_filtrado['ano'] = df_filtrado.index.year
+    queimadas_por_bioma = df_filtrado.groupby(['bioma']).size().reset_index(name='num_queimadas')
     top10bioma = queimadas_por_bioma.nlargest(5, 'num_queimadas')
+    anoo = df_filtrado['ano'].unique()
     
     fig_max_bioma = px.bar(
-        top10bioma, x='bioma', y='num_queimadas', width=300, height=300)
+        top10bioma, y='bioma', x='num_queimadas', width=300, height=300)
     
-    fig_max_bioma.update_layout(showlegend=False, xaxis_title="bioma", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 5 Biomas {anoo}',
+    fig_max_bioma.update_layout(showlegend=False, xaxis_title="bioma", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 5 Biomas {anoo.min()} até {anoo.max()}',
                'y': 0.93,
                'x': 0.5,
                'xanchor': 'center',
                'yanchor': 'top',
                'font_size': 20,
                'font_color': 'white'})
-    col7.plotly_chart(fig_max_bioma, use_container_width=True)
+    st.plotly_chart(fig_max_bioma, use_container_width=True)
     
 else:
     
     #focos por municipio
+
     df_filtrado['ano'] = df_filtrado.index.year
-    queimadas_por_municipio = df_filtrado.groupby(['ano', 'municipio']).size().reset_index(name='num_queimadas')
+    queimadas_por_municipio = df_filtrado.groupby(['municipio']).size().reset_index(name='num_queimadas')
     top10municipio = queimadas_por_municipio.nlargest(10, 'num_queimadas')
-    anoo = top10municipio['ano'].unique()
+    anoo = df_filtrado['ano'].unique()
 
     fig_max_municipio = px.bar(
-        top10municipio, x='municipio', y='num_queimadas', width=300, height=300)
+        top10municipio, y='municipio', x='num_queimadas', width=300, height=300)
 
-    fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municipios {anoo}',
+    fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municipios {anoo.min()} até {anoo.max()}',
                 'y': 0.93,
                 'x': 0.5,
                 'xanchor': 'center',

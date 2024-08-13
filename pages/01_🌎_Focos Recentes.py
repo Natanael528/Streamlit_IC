@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import datetime 
 from datetime import datetime
 from streamlit_folium import st_folium
 import folium
@@ -39,7 +40,7 @@ def load_data():
 
 
 with st.sidebar:
-    periodo = st.radio('Selecione o Período do dado', ['Mensal Atual', 'Ultimas 24 Horas'])
+    periodo = st.radio('Selecione o Período do dado', ['Diario', 'Ultimas 24 Horas'])
 
 
 if periodo == 'Ultimas 24 Horas':
@@ -52,13 +53,13 @@ if periodo == 'Ultimas 24 Horas':
     df = df1[df1.index.floor('1H').isin(data)]                                   #floor('H') acha o valor no index mais proximo da data filtrada, isin filtra o index atras dos valores do filtro anterior
     
     st.sidebar.divider()
-    on = st.sidebar.toggle("Todos os Satelites")
-    if on:      
-        dfiltrado = df  
-    else:
-        sat = df.satelite.unique().tolist() 
-        selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= 11)
-        dfiltrado = df[df['satelite'] == selec]
+    # on = st.sidebar.toggle("Todos os Satelites")
+    # if on:      
+    #     dfiltrado = df  
+    # else:
+    sat = df.satelite.unique().tolist() 
+    selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= 11)
+    dfiltrado = df[df['satelite'] == selec]
 
     
     #teste leafmap
@@ -69,23 +70,22 @@ if periodo == 'Ultimas 24 Horas':
 
 else:
     
-    st.title('Focos de Queimadas no mês atual')
+    st.title('Focos de Queimadas diario')
         
     df1 = load_data()
-    
     data = df1.groupby(pd.Grouper(freq='1D')).count()['lat'].index
     st.sidebar.divider()
     dataselec = st.sidebar.selectbox('Selecione o dia', options= data)
 
     df = df1[df1.index.floor('D').isin([dataselec])]                 
    
-    on = st.sidebar.toggle("Todos os Satelites")
-    if on:      
-        dfiltrado = df  
-    else:
-        sat = df.satelite.unique().tolist() 
-        selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= 11)
-        dfiltrado = df[df['satelite'] == selec]
+    # on = st.sidebar.toggle("Todos os Satelites")
+    # if on:      
+    #     dfiltrado = df  
+    # else:
+    sat = df.satelite.unique().tolist() 
+    selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= 11)
+    dfiltrado = df[df['satelite'] == selec]
 
 
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
