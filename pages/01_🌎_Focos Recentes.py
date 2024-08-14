@@ -74,8 +74,9 @@ else:
         
     df1 = load_data()
     data = df1.groupby(pd.Grouper(freq='1D')).count()['lat'].index
+    data_formatada = data.strftime('%Y/%m/%d')
     st.sidebar.divider()
-    dataselec = st.sidebar.selectbox('Selecione o dia', options= data)
+    dataselec = st.sidebar.selectbox('Selecione o dia', options= data_formatada)
 
     df = df1[df1.index.floor('D').isin([dataselec])]                 
    

@@ -51,10 +51,10 @@ with st.sidebar:
         
         # seleciona a "DATA"
         anos_disponiveis = sorted(df.index.year.unique())
-
+        
         st.sidebar.divider()
         data_inicial = st.selectbox('Ano inicial', anos_disponiveis)
-        data_final = st.selectbox('Ano final', anos_disponiveis)
+        data_final = st.selectbox('Ano final', anos_disponiveis, index = 21)
         # filtra por Data
         df_filtrado = df.loc[str(data_inicial):str(data_final)]
         
@@ -70,7 +70,7 @@ with st.sidebar:
 
         # seleciona a "DATA"
         data_inicial = st.date_input('Data **INICIAL**:', datetime.date(2003, 1, 1)) #setar minimo 
-        data_final = st.date_input('Data **FINAL**:')
+        data_final = st.date_input('Data **FINAL**:', datetime.date(2024, 1, 1))
 
         # filtra por Data
         df_filtrado = df.loc[str(data_inicial):str(data_final)]
