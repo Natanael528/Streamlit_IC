@@ -11,13 +11,20 @@
 .st-emotion-cache-4z1n4l > label {
     visibility: hidden;
 }
+/*#### fonte subheader####*/
+.st-emotion-cache-1jzia57.e1nzilvr2 h3{
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 600;
+    font-size: large;
+    color: rgba(250, 250, 250, 0.644);
+}
 
 /*####alterar cor do background da barra lateral######*/
 .st-emotion-cache-1itdyc2 {
     background: linear-gradient(90deg, #1c1c1c 55.94%, rgba(28, 28, 28, 0) 100%) !important;
 }
 .st-emotion-cache-h4xjwg {
-    background: #262626 !important;
+    background: linear-gradient(180deg, #ff912a0c 5.94%, rgba(28, 28, 28, 0) 100%) !important;
 }
 .st-emotion-cache-1dp5vir {
     position: absolute;

@@ -34,13 +34,13 @@ def load_data():
             'data_hora_gmt'], inplace=True, axis= 1 )
     df.fillna(0, inplace=True)
     df.set_index('data',inplace=True)
-    
-    df = df[['lat','lon','satelite','pais','estado','municipio','bioma','risco_fogo','frp']]    
+    df = df[['lat','lon','satelite','pais','estado','municipio','bioma','risco_fogo','frp']]   
+    df = df.rename(columns={'lat':'Lat','lon':'Lon','satelite':'Satelite','pais':'País','estado':'Estado','municipio':'Município','bioma':'Bioma','risco_fogo':'Risco de fogo','frp':'frp'})   
     return df
 
 
 with st.sidebar:
-    periodo = st.radio('Selecione o Período do dado', ['Diario', 'Ultimas 24 Horas'])
+    periodo = st.radio('Selecione o Período do dado', ['Diário', 'Ultimas 24 Horas'])
 
 
 if periodo == 'Ultimas 24 Horas':
@@ -49,47 +49,60 @@ if periodo == 'Ultimas 24 Horas':
     
     df1 = load_data()
     
-    data = df1.groupby(pd.Grouper(freq='1H')).count()['lat'].tail(24).index     #filtra por hora e seleciona as ultimas 24horas 
+    data = df1.groupby(pd.Grouper(freq='1H')).count()['Lat'].tail(24).index     #filtra por hora e seleciona as ultimas 24horas 
     df = df1[df1.index.floor('1H').isin(data)]                                   #floor('H') acha o valor no index mais proximo da data filtrada, isin filtra o index atras dos valores do filtro anterior
     
     st.sidebar.divider()
-    # on = st.sidebar.toggle("Todos os Satelites")
-    # if on:      
-    #     dfiltrado = df  
-    # else:
-    sat = df.satelite.unique().tolist() 
-    selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= 11)
-    dfiltrado = df[df['satelite'] == selec]
 
+    sat = df['Satelite'].unique().tolist()
+    # Verifica se 'AQUA_M-T' ou 'AQUA_M-M' está na lista
+    if 'AQUA_M-T' in sat:
+        indice = sat.index('AQUA_M-T')
+    elif 'AQUA_M-M' in sat:
+        indice = sat.index('AQUA_M-M')
+    else:
+        indice = 0
+        
+    # Seleciona o satélite
+    selec = st.sidebar.selectbox('Selecione um Satélite', sat, index= indice)
+    dfiltrado = df[df['Satelite'] == selec]
     
     #teste leafmap
-    
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(dfiltrado, x="lon", y="lat", layer_name="Marcadores") 
+    Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores") 
     Map.to_streamlit(width=1350, height=700)
 
 else:
     
-    st.title('Focos de Queimadas diario')
+    st.title('Focos de queimadas diário')
+    
         
     df1 = load_data()
-    data = df1.groupby(pd.Grouper(freq='1D')).count()['lat'].index
+    data = df1.groupby(pd.Grouper(freq='1D')).count()['Lat'].index
     data_formatada = data.strftime('%Y/%m/%d')
+    
+    ultimo_indice = len(data_formatada) - 1
     st.sidebar.divider()
-    dataselec = st.sidebar.selectbox('Selecione o dia', options= data_formatada)
-
+    dataselec = st.sidebar.selectbox('Selecione o dia', options= data_formatada, index=ultimo_indice)
+    st.subheader(f'Data: {dataselec}')
     df = df1[df1.index.floor('D').isin([dataselec])]                 
    
-    # on = st.sidebar.toggle("Todos os Satelites")
-    # if on:      
-    #     dfiltrado = df  
-    # else:
-    sat = df.satelite.unique().tolist() 
-    selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= 11)
-    dfiltrado = df[df['satelite'] == selec]
+
+    sat = df['Satelite'].unique().tolist()
+
+    # Verifica se 'AQUA_M-T' ou 'AQUA_M-M' está na lista
+    if 'AQUA_M-T' in sat:
+        indice = sat.index('AQUA_M-T')
+    elif 'AQUA_M-M' in sat:
+        indice = sat.index('AQUA_M-M')
+    else:
+        indice = 0
+    selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= indice)
+    dfiltrado = df[df['Satelite'] == selec]
 
 
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(dfiltrado, x="lon", y="lat", layer_name="Marcadores")             #NAO FUNCIONA :(
+    Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")             #NAO FUNCIONA :(
     Map.to_streamlit(width=1350, height=700)
+
 

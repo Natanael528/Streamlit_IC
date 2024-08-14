@@ -45,9 +45,9 @@ df = load_data()
 # sidebar
 with st.sidebar:
     rad = st.radio('Serie temporal',
-                   ['Brasil todo','Por estado'],
+                   ['Brasil','Por estado'],
                    )
-    if rad == 'Brasil todo':
+    if rad == 'Brasil':
         
         # seleciona a "DATA"
         anos_disponiveis = sorted(df.index.year.unique())
@@ -82,16 +82,17 @@ with st.sidebar:
 
 # mostra o estado
 if rad == 'Por estado':
-    st.markdown(f'### Estado selecionado = {estado_selecionado}')
-    
+    st.title(f' Focos de Queimadas por Estado')
+    st.subheader(f'Estado selecionado: {estado_selecionado}')
 else:
-    st.markdown(f'### Focos de Queimadas no Brasil')
+    st.title(f'Focos de Queimadas a Nível Brasil')
 
 
 # esta parte será usada para os gráficos
 col1, col2 = st.columns(2)  # Isto significa 2 
 col3, col4 = st.columns(2)  # Isto significa 2 
 col5, col6 = st.columns(2)
+
 # DIÁRIO TOTAL
 diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
 fig_diaria = px.line(diaria, width=300, height=300)
@@ -137,7 +138,7 @@ col3.plotly_chart(fig_mensal, use_container_width=True)
 mensal_climatologia = mensal.groupby(mensal.index.month).sum() #sum
 fig_mensal_climatologia = px.bar(mensal_climatologia, width=300, height=300)
 fig_mensal_climatologia.update_layout(showlegend=False, xaxis_title="Mês", yaxis_title="Quantidade de Focos de Calor", 
-                        title={'text': 'Soma focos Mensais',
+                        title={'text': 'Total mensal',
                                 'y': 0.93,
                                 'x': 0.5,
                                 'xanchor': 'center',
@@ -146,7 +147,7 @@ fig_mensal_climatologia.update_layout(showlegend=False, xaxis_title="Mês", yaxi
                                 'font_color': 'white'})
 col4.plotly_chart(fig_mensal_climatologia, use_container_width=True)
 
-if rad == 'Brasil todo':
+if rad == 'Brasil':
     
 #focos por municipio
     df_filtrado['ano'] = df_filtrado.index.year
@@ -155,7 +156,7 @@ if rad == 'Brasil todo':
     anoo = df_filtrado['ano'].unique()
     
     fig_max_municipio = px.bar(
-        top10municipio, y='municipio', x='num_queimadas', width=300, height=300)
+        top10municipio, y='municipio', x='num_queimadas')
     
     fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municipios {anoo.min()} até {anoo.max()}',
                'y': 0.93,
@@ -164,7 +165,7 @@ if rad == 'Brasil todo':
                'yanchor': 'top',
                'font_size': 20,
                'font_color': 'white'})
-    col5.plotly_chart(fig_max_municipio, use_container_width=True)
+    col5.plotly_chart(fig_max_municipio, use_container_width=False, width=400, height=300)
 
 
 
@@ -175,7 +176,7 @@ if rad == 'Brasil todo':
     anoo = df_filtrado['ano'].unique()
     
     fig_max_estado = px.bar(
-        top10estados, y='estado', x='num_queimadas', width=300, height=300)
+        top10estados, y='estado', x='num_queimadas',)
     
     fig_max_estado.update_layout(showlegend=False, xaxis_title="Estado", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Estados {anoo.min()} até {anoo.max()}',
                'y': 0.93,
@@ -184,7 +185,7 @@ if rad == 'Brasil todo':
                'yanchor': 'top',
                'font_size': 20,
                'font_color': 'white'})
-    col6.plotly_chart(fig_max_estado, use_container_width=True)
+    col6.plotly_chart(fig_max_estado, use_container_width=False, width=400, height=300)
 
 
 #focos por bioma
@@ -195,7 +196,7 @@ if rad == 'Brasil todo':
     anoo = df_filtrado['ano'].unique()
     
     fig_max_bioma = px.bar(
-        top10bioma, y='bioma', x='num_queimadas', width=300, height=300)
+        top10bioma, y='bioma', x='num_queimadas')
     
     fig_max_bioma.update_layout(showlegend=False, xaxis_title="bioma", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 5 Biomas {anoo.min()} até {anoo.max()}',
                'y': 0.93,
@@ -204,7 +205,7 @@ if rad == 'Brasil todo':
                'yanchor': 'top',
                'font_size': 20,
                'font_color': 'white'})
-    st.plotly_chart(fig_max_bioma, use_container_width=True)
+    st.plotly_chart(fig_max_bioma, use_container_width=False, width=1000, height=300)
     
 else:
     
@@ -216,7 +217,7 @@ else:
     anoo = df_filtrado['ano'].unique()
 
     fig_max_municipio = px.bar(
-        top10municipio, y='municipio', x='num_queimadas', width=300, height=300)
+        top10municipio, y='municipio', x='num_queimadas')
 
     fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municipios {anoo.min()} até {anoo.max()}',
                 'y': 0.93,
@@ -225,5 +226,5 @@ else:
                 'yanchor': 'top',
                 'font_size': 20,
                 'font_color': 'white'})
-    st.plotly_chart(fig_max_municipio, use_container_width=True)
+    st.plotly_chart(fig_max_municipio, use_container_width=False, width=1000, height=300)
         
