@@ -45,7 +45,7 @@ df = load_data()
 # sidebar
 with st.sidebar:
     rad = st.radio('Serie temporal',
-                   ['Brasil','Por estado'],
+                   ['Brasil','Por Estado'],
                    )
     if rad == 'Brasil':
         
@@ -68,9 +68,9 @@ with st.sidebar:
         st.sidebar.divider()
         estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
 
-        # seleciona a "DATA"
-        data_inicial = st.date_input('Data **INICIAL**:', datetime.date(2003, 1, 1)) #setar minimo 
-        data_final = st.date_input('Data **FINAL**:', datetime.date(2024, 1, 1))
+        # Seleciona a "DATA"
+        data_inicial = st.date_input('Data **INICIAL**:', datetime.date(2003, 1, 1))
+        data_final = st.date_input('Data **FINAL**:', datetime.date(2024, 8, 16))
 
         # filtra por Data
         df_filtrado = df.loc[str(data_inicial):str(data_final)]
@@ -81,9 +81,9 @@ with st.sidebar:
         
 
 # mostra o estado
-if rad == 'Por estado':
+if rad == 'Por Estado':
     st.title(f' Focos de Queimadas por Estado')
-    st.subheader(f'Estado selecionado: {estado_selecionado}')
+    st.subheader(f'Estado Selecionado: {estado_selecionado}')
 else:
     st.title(f'Focos de Queimadas a Nível Brasil')
 
@@ -158,7 +158,7 @@ if rad == 'Brasil':
     fig_max_municipio = px.bar(
         top10municipio, y='municipio', x='num_queimadas')
     
-    fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municipios {anoo.min()} até {anoo.max()}',
+    fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municípios<br><span style="color:rgba(250, 250, 250, 0.644); font-size:16px;">Período: {anoo.min()} à {anoo.max()}</span>',
                'y': 0.93,
                'x': 0.5,
                'xanchor': 'center',
@@ -178,7 +178,7 @@ if rad == 'Brasil':
     fig_max_estado = px.bar(
         top10estados, y='estado', x='num_queimadas',)
     
-    fig_max_estado.update_layout(showlegend=False, xaxis_title="Estado", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Estados {anoo.min()} até {anoo.max()}',
+    fig_max_estado.update_layout(showlegend=False, xaxis_title="Estado", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Estados<br><span style="color:rgba(250, 250, 250, 0.644); font-size:16px;">Período: {anoo.min()} à {anoo.max()}</span>',
                'y': 0.93,
                'x': 0.5,
                'xanchor': 'center',
@@ -198,7 +198,7 @@ if rad == 'Brasil':
     fig_max_bioma = px.bar(
         top10bioma, y='bioma', x='num_queimadas')
     
-    fig_max_bioma.update_layout(showlegend=False, xaxis_title="bioma", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 5 Biomas {anoo.min()} até {anoo.max()}',
+    fig_max_bioma.update_layout(showlegend=False, xaxis_title="bioma", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 5 Biomas<br><span style="color:rgba(250, 250, 250, 0.644); font-size:16px;">Período: {anoo.min()} à {anoo.max()}</span>',
                'y': 0.93,
                'x': 0.5,
                'xanchor': 'center',
@@ -219,7 +219,7 @@ else:
     fig_max_municipio = px.bar(
         top10municipio, y='municipio', x='num_queimadas')
 
-    fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municipios {anoo.min()} até {anoo.max()}',
+    fig_max_municipio.update_layout(showlegend=False, xaxis_title="Cidades", yaxis_title="Quantidade de Focos de Calor", title={'text': f'Top 10 Municípios<br><span style="color:rgba(250, 250, 250, 0.644); font-size:16px;">Período: {anoo.min()} à {anoo.max()}</span>',
                 'y': 0.93,
                 'x': 0.5,
                 'xanchor': 'center',

@@ -55,7 +55,6 @@ if periodo == 'Ultimas 24 Horas':
     st.sidebar.divider()
 
     sat = df['Satelite'].unique().tolist()
-    # Verifica se 'AQUA_M-T' ou 'AQUA_M-M' está na lista
     if 'AQUA_M-T' in sat:
         indice = sat.index('AQUA_M-T')
     elif 'AQUA_M-M' in sat:
@@ -75,22 +74,19 @@ if periodo == 'Ultimas 24 Horas':
 else:
     
     st.title('Focos de queimadas diário')
-    
         
     df1 = load_data()
     data = df1.groupby(pd.Grouper(freq='1D')).count()['Lat'].index
-    data_formatada = data.strftime('%Y/%m/%d')
-    
-    ultimo_indice = len(data_formatada) - 1
+
+    data_formatada = data.strftime('%Y/%m/%d')[::-1]
+
     st.sidebar.divider()
-    dataselec = st.sidebar.selectbox('Selecione o dia', options= data_formatada, index=ultimo_indice)
+    dataselec = st.sidebar.selectbox('Selecione o dia', options=data_formatada)
     st.subheader(f'Data: {dataselec}')
-    df = df1[df1.index.floor('D').isin([dataselec])]                 
+    df = df1[df1.index.floor('D').isin([dataselec])]                
    
 
     sat = df['Satelite'].unique().tolist()
-
-    # Verifica se 'AQUA_M-T' ou 'AQUA_M-M' está na lista
     if 'AQUA_M-T' in sat:
         indice = sat.index('AQUA_M-T')
     elif 'AQUA_M-M' in sat:
