@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import datetime 
 from datetime import datetime,timedelta
-from streamlit_folium import st_folium
-import folium
 import leafmap.foliumap as leafmap
 
 
