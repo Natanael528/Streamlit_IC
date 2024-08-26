@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import datetime 
-from datetime import datetime
+from datetime import datetime,timedelta
 from streamlit_folium import st_folium
 import folium
 import leafmap.foliumap as leafmap
@@ -20,8 +20,9 @@ st.logo('Logos/cropped-simbolo_RGB.png',
         link= 'https://meteorologia.unifei.edu.br')
 
 
-@st.cache_data
-def load_data():
+@st.cache_data 
+def load_data():#dados principais mensais 
+    
     data = datetime.now().strftime("%Y%m")
     df = pd.read_csv(f'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/focos_mensal_br_{data}.csv')
     df['data'] = pd.to_datetime(df['data_hora_gmt'])
@@ -38,15 +39,37 @@ def load_data():
     df = df.rename(columns={'lat':'Lat','lon':'Lon','satelite':'Satelite','pais':'País','estado':'Estado','municipio':'Município','bioma':'Bioma','risco_fogo':'Risco de fogo','frp':'frp'})   
     return df
 
+def load_data2(minu):
+    dfs = []
+    
+    for i in range(0, minu, 10):
+        data_anterior = datetime.now() - timedelta(minutes=i)
+        
+        # Arredondar o tempo para o múltiplo de 10 minutos
+        data = data_anterior.replace(minute=(data_anterior.minute // 10) * 10, second=0, microsecond=0).strftime("%Y%m%d_%H%M")
+        
+        df = pd.read_csv(f'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/10min/focos_10min_{data}.csv')
+        df['data'] = pd.to_datetime(df['data'])
+        df.fillna(0, inplace=True)
+        df.set_index('data', inplace=True)
+        df = df[['lat', 'lon', 'satelite']]
+        df = df.rename(columns={'lat': 'Lat', 'lon': 'Lon', 'satelite': 'Satelite'})
+        
+        # Adicionar o DataFrame à lista
+        dfs.append(df)
+        df = pd.concat(dfs)
+    
+    return df
+
 
 with st.sidebar:
-    periodo = st.radio('Selecione o Período do dado', ['Diário', 'Ultimas 24 Horas'])
+    periodo = st.radio('Selecione o Período do dado', ['Diário', 'Ultimas 24 Horas', 'Horário'])
 
 
 if periodo == 'Ultimas 24 Horas':
     
     st.title('Focos de Queimadas nas ultimas 24 horas')
-    
+
     df1 = load_data()
     
     data = df1.groupby(pd.Grouper(freq='1H')).count()['Lat'].tail(24).index     #filtra por hora e seleciona as ultimas 24horas 
@@ -71,7 +94,7 @@ if periodo == 'Ultimas 24 Horas':
     Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores") 
     Map.to_streamlit(width=1350, height=700)
 
-else:
+elif periodo == ('Diário'):
     
     st.title('Focos de queimadas diário')
         
@@ -96,9 +119,43 @@ else:
     selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= indice)
     dfiltrado = df[df['Satelite'] == selec]
 
-
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")             #NAO FUNCIONA :(
+    Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")             
     Map.to_streamlit(width=1350, height=700)
 
 
+elif periodo == ('Horário'):
+    
+    st.title('Focos de queimadas Horário')
+    
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["10 Min", "10 - 60 Min", "60 - 120 Min", "120 - 180 Min", "180 - 240 Min"])
+    
+    with tab1:
+        df2 = load_data2(10)
+        Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
+        Map.add_points_from_xy(df2, x="Lon", y="Lat", layer_name="Marcadores") 
+        Map.to_streamlit(width=1350, height=700)
+    
+    with tab2:
+        df2 = load_data2(70)
+        Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
+        Map.add_points_from_xy(df2, x="Lon", y="Lat", layer_name="Marcadores") 
+        Map.to_streamlit(width=1350, height=700)
+        
+    with tab3:
+        df2 = load_data2(130)
+        Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
+        Map.add_points_from_xy(df2, x="Lon", y="Lat", layer_name="Marcadores") 
+        Map.to_streamlit(width=1350, height=700)
+        
+    with tab4:
+        df2 = load_data2(190)
+        Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
+        Map.add_points_from_xy(df2, x="Lon", y="Lat", layer_name="Marcadores") 
+        Map.to_streamlit(width=1350, height=700)
+        
+    with tab5:
+        df2 = load_data2(250)
+        Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
+        Map.add_points_from_xy(df2, x="Lon", y="Lat", layer_name="Marcadores") 
+        Map.to_streamlit(width=1350, height=700)
