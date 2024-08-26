@@ -7,4 +7,4 @@ leafmap
 ipyleaflet
 proplot
 timedelta
-datetime
+datetime,datetime
