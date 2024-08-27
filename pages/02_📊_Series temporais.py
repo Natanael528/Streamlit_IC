@@ -92,6 +92,7 @@ else:
 col1, col2 = st.columns(2)  # Isto significa 2 
 col3, col4 = st.columns(2)  # Isto significa 2 
 col5, col6 = st.columns(2)
+col7, col8, col9 = st.columns([2,6,2])
 
 # DIÁRIO TOTAL
 diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
@@ -153,6 +154,7 @@ if rad == 'Brasil':
     df_filtrado['ano'] = df_filtrado.index.year
     queimadas_por_municipio = df_filtrado.groupby(['municipio']).size().reset_index(name='num_queimadas')
     top10municipio = queimadas_por_municipio.nlargest(10, 'num_queimadas')
+    top10municipio = top10municipio.sort_values(by='num_queimadas', ascending=True)
     anoo = df_filtrado['ano'].unique()
     
     fig_max_municipio = px.bar(
@@ -173,6 +175,7 @@ if rad == 'Brasil':
     df_filtrado['ano'] = df_filtrado.index.year
     queimadas_por_estado = df_filtrado.groupby(['estado']).size().reset_index(name='num_queimadas')
     top10estados = queimadas_por_estado.nlargest(10, 'num_queimadas')
+    top10estados = top10estados.sort_values(by='num_queimadas', ascending=True)
     anoo = df_filtrado['ano'].unique()
     
     fig_max_estado = px.bar(
@@ -193,6 +196,8 @@ if rad == 'Brasil':
     df_filtrado['ano'] = df_filtrado.index.year
     queimadas_por_bioma = df_filtrado.groupby(['bioma']).size().reset_index(name='num_queimadas')
     top10bioma = queimadas_por_bioma.nlargest(5, 'num_queimadas')
+    top10bioma = top10bioma.sort_values(by='num_queimadas', ascending=True)
+    
     anoo = df_filtrado['ano'].unique()
     
     fig_max_bioma = px.bar(
@@ -205,7 +210,7 @@ if rad == 'Brasil':
                'yanchor': 'top',
                'font_size': 20,
                'font_color': 'white'})
-    st.plotly_chart(fig_max_bioma, use_container_width=False, width=1000, height=300)
+    col8.plotly_chart(fig_max_bioma, use_container_width=False, width=400, height=300)
     
 else:
     
@@ -214,6 +219,7 @@ else:
     df_filtrado['ano'] = df_filtrado.index.year
     queimadas_por_municipio = df_filtrado.groupby(['municipio']).size().reset_index(name='num_queimadas')
     top10municipio = queimadas_por_municipio.nlargest(10, 'num_queimadas')
+    top10municipio = top10municipio.sort_values(by='num_queimadas', ascending=True)
     anoo = df_filtrado['ano'].unique()
 
     fig_max_municipio = px.bar(
@@ -226,5 +232,5 @@ else:
                 'yanchor': 'top',
                 'font_size': 20,
                 'font_color': 'white'})
-    st.plotly_chart(fig_max_municipio, use_container_width=False, width=1000, height=300)
+    col8.plotly_chart(fig_max_municipio, use_container_width=False, width=400, height=300)
         
