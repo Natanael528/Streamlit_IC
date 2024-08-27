@@ -6,4 +6,4 @@ setuptools
 leafmap
 ipyleaflet
 proplot
-datetime,timedelta
+timedelta
