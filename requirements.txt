@@ -6,4 +6,4 @@ setuptools
 leafmap
 ipyleaflet
 proplot
-install datetime,timedelta
+datetime,timedelta
