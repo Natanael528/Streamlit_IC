@@ -82,7 +82,7 @@ if periodo == ('Diário'):
         indice = 0
     selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= indice)
     dfiltrado = df[df['Satelite'] == selec]
-    dfiltrado
+
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
     Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")             
     Map.to_streamlit(width=1350, height=700)
