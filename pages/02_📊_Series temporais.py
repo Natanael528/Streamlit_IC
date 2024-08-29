@@ -111,7 +111,6 @@ col1.plotly_chart(fig_diaria, use_container_width=True)
 # ANUAL TOTAL 
 anual = df_filtrado.groupby(pd.Grouper(freq='1YE')).count()['lat']
 fig_anual = px.bar(x=anual.index.year, y=anual.values, width=300, height=300)
-fig_anual.update_traces(line=dict(color='#FF902A'))
 fig_anual.update_layout(showlegend=False, xaxis_title="Ano", yaxis_title="Quantidade de Focos de Calor", 
                         title={'text': 'Anual',
                                 'y': 0.93,
@@ -126,7 +125,6 @@ col2.plotly_chart(fig_anual, use_container_width=True)
 # MENSAL TOTAL
 mensal = df_filtrado.groupby(pd.Grouper(freq='1ME')).count()['lat']
 fig_mensal = px.line(mensal, width=300, height=300)
-fig_mensal.update_traces(line=dict(color='#FF902A'))
 fig_mensal.update_layout(showlegend=False, xaxis_title="Mês/Ano", yaxis_title="Quantidade de Focos de Calor", 
                         title={'text': 'Mensal',
                                 'y': 0.93,
@@ -140,7 +138,6 @@ col3.plotly_chart(fig_mensal, use_container_width=True)
 # MENSAL MÉDIO
 mensal_climatologia = mensal.groupby(mensal.index.month).sum() #sum
 fig_mensal_climatologia = px.bar(mensal_climatologia, width=300, height=300)
-fig_mensal.update_traces(line=dict(color='#FF902A'))
 fig_mensal_climatologia.update_layout(showlegend=False, xaxis_title="Mês", yaxis_title="Quantidade de Focos de Calor", 
                         title={'text': 'Total mensal',
                                 'y': 0.93,
@@ -163,7 +160,6 @@ if rad == 'Brasil':
     fig_max_municipio = px.bar(
         top10municipio, y='municipio', x='num_queimadas')
     
-    fig_max_municipio.update_traces(line=dict(color='#FF902A'))
     fig_max_municipio.update_layout(showlegend=False, xaxis_title="Quantidade de Focos de Calor", yaxis_title="Cidades", title={'text': f'Top 10 Municípios<br><span style="color:rgba(250, 250, 250, 0.644); font-size:16px;">Período: {anoo.min()} à {anoo.max()}</span>',
                'y': 0.93,
                'x': 0.5,
@@ -184,7 +180,6 @@ if rad == 'Brasil':
     
     fig_max_estado = px.bar(
         top10estados, y='estado', x='num_queimadas',)
-    fig_max_estado.update_traces(line=dict(color='#FF902A'))
     fig_max_estado.update_layout(showlegend=False, xaxis_title="Quantidade de Focos de Calor", yaxis_title="Estado", title={'text': f'Top 10 Estados<br><span style="color:rgba(250, 250, 250, 0.644); font-size:16px;">Período: {anoo.min()} à {anoo.max()}</span>',
                'y': 0.93,
                'x': 0.5,
@@ -206,7 +201,6 @@ if rad == 'Brasil':
     
     fig_max_bioma = px.bar(
         top10bioma, y='bioma', x='num_queimadas')
-    fig_max_bioma.update_traces(line=dict(color='#FF902A'))
     fig_max_bioma.update_layout(showlegend=False, xaxis_title="Quantidade de Focos de Calor", yaxis_title="Bioma", title={'text': f'Top 5 Biomas<br><span style="color:rgba(250, 250, 250, 0.644); font-size:16px;">Período: {anoo.min()} à {anoo.max()}</span>',
                'y': 0.93,
                'x': 0.5,
@@ -228,7 +222,6 @@ else:
 
     fig_max_municipio = px.bar(
         top10municipio, y='municipio', x='num_queimadas')
-    fig_max_municipio.update_traces(line=dict(color='#FF902A'))
     fig_max_municipio.update_layout(showlegend=False, xaxis_title="Quantidade de Focos de Calor", yaxis_title="Cidades", title={'text': f'Top 10 Municípios<br><span style="color:rgba(250, 250, 250, 0.644); font-size:16px;">Período: {anoo.min()} à {anoo.max()}</span>',
                 'y': 0.93,
                 'x': 0.5,
