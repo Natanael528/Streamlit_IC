@@ -100,22 +100,9 @@ df2 = load_data2()
 tab1, tab2, tab3, tab4, tab5 = st.tabs(["10 Min", "10 - 60 Min", "60 - 120 Min", "120 - 180 Min", "180 - 240 Min"])
 
 with tab1:
-    # Criando o mapa base com leafmap
+    df_interval = pd.concat(df2[0], ignore_index=True)  # Concatena os DataFrames no intervalo
     Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
-
-    # Adicionando uma camada de pontos a partir do DataFrame df2
-    Map.add_points_from_xy(df2[0], x="Lon", y="Lat", layer_name="Marcadores", icon="info-sign")
-
-    # # Adicionando outra camada de marcadores circulares usando folium
-    # for i, row in df2[0].iterrows():
-    #     folium.CircleMarker(location=[row['Lat'], row['Lon']],
-    #                         radius=2,  # Tamanho menor do marcador
-    #                         fill=True,
-    #                         color='orange',  # Cor vermelha
-    #                         fill_color='orange',
-    #                         layer_name="Pontos").add_to(Map)
-
-    # Exibindo o mapa no Streamlit
+    Map.add_points_from_xy(df_interval, x="Lon", y="Lat", layer_name="Marcadores") 
     Map.to_streamlit(width=1350, height=700)
 
 with tab2:
