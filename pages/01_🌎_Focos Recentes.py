@@ -99,7 +99,6 @@ else:
     col1, col2 = st.columns([8, 1.4], vertical_alignment="bottom") #divide a pagina em duas colunas com tamanhos diferentes
 
     df2 = load_data2()
-    df2
     selected_dfs = []
     with col2: #deixa no canto direito as selectboxs 
         st.divider()
