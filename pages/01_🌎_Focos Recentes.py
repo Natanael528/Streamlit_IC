@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
-import datetime
 from datetime import datetime,timedelta
 import leafmap.foliumap as leafmap
-import folium
 
 
 st.set_page_config(layout='wide',
