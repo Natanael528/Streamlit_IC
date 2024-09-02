@@ -9,7 +9,7 @@ import folium
 st.set_page_config(layout='wide',
                    page_icon=':fire:',
                    page_title='Unifei Queimadas',
-                   initial_sidebar_state='expanded',
+                   initial_sidebar_state='collapsed',
                    )
 
 with open('style.css')as f:
@@ -20,7 +20,7 @@ st.logo('Logos/cropped-simbolo_RGB.png',
 
 ####################################################################### Download dados #######################################################################
 @st.cache_data 
-def load_data(): #dados principais mensais 
+def load_data(): #dados principais mensais
     
     data = datetime.now().strftime("%Y%m")
     df = pd.read_csv(f'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/focos_mensal_br_{data}.csv', usecols=(['data_hora_gmt','lat','lon','satelite','bioma']))
@@ -32,11 +32,11 @@ def load_data(): #dados principais mensais
 
 def load_data2():
     dfs = []
-    for i in range(0, 250, 10):
-        data_anterior = datetime.now() - timedelta(minutes=i)
+    for i in range(0, 50, 10):
+        data_anterior = datetime.now() - timedelta(hours=-3,minutes=i)
         
         # Arredondar o tempo para o múltiplo de 10 minutos
-        data = data_anterior.replace(minute=(data_anterior.minute // 10) * 10, second=0, microsecond=0).strftime("%Y%m%d_%H%M")
+        data = data_anterior.replace(minute=(data_anterior.minute // 10) * 10, second=0, microsecond=0).strftime("%Y%m%d_%H%M") 
         
         try: # Tentar carregar o CSV
             
@@ -53,14 +53,18 @@ def load_data2():
         df = pd.concat(dfs)
     
     return dfs
+
+def convert_df(dfd): #converter arquivos para donwload
+    return dfd.to_csv().encode("utf-8")
 ##############################################################################################################################################################
+
 
 with st.sidebar:
     periodo = st.radio('Selecione o Período do dado', ['Horário','Diário'])
 
 
 if periodo == ('Diário'):
-    
+
     st.title('Focos de queimadas diário')
         
     df1 = load_data()
@@ -84,46 +88,59 @@ if periodo == ('Diário'):
     selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= indice)
     dfiltrado = df[df['Satelite'] == selec]
 
-    Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=4, tiles='cartodbdark_matter')
+    Map = leafmap.Map(center=[-19, -60], zoom=4, tiles='cartodbdark_matter')
     Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")             
-    Map.to_streamlit(width=1350, height=700)
-
+    Map.to_streamlit(width=1500, height=700)
+    
+    csv = convert_df(dfiltrado)
+    st.sidebar.download_button(label="Download CSV", data = csv, file_name= f'{selec}_{dataselec}.csv') #botao de donwload dos dados selecionados
 
 else:
+    st.title('Focos de queimadas Horário')  
+     
+    col1, col2 = st.columns([8, 1.4], vertical_alignment="bottom") #divide a pagina em duas colunas com tamanhos diferentes
+
+    df2 = load_data2()
     
-    st.title('Focos de queimadas Horário')
-    
-# Supondo que load_data2() retorna uma lista de DataFrames
-df2 = load_data2()
+    selected_dfs = []
+    with col2: #deixa no canto direito as selectboxs 
+        st.divider()
+        st.text('Selecione o Período')
 
-# Criar as abas
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["10 Min", "10 - 60 Min", "60 - 120 Min", "120 - 180 Min", "180 - 240 Min"])
+        min1 = st.checkbox("10 Min", value=True)
+        if min1:
+            selected_dfs.append(df2[0])
 
-with tab1:
-    Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(df2[0], x="Lon", y="Lat", layer_name="Marcadores") 
-    Map.to_streamlit(width=1350, height=700)
+        min2 = st.checkbox("20 Min")
+        if min2:
+            selected_dfs.append(df2[1])
 
-with tab2:
-    df_interval = pd.concat(df2[0:6], ignore_index=True)  # Concatena os DataFrames no intervalo
-    Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(df_interval, x="Lon", y="Lat", layer_name="Marcadores") 
-    Map.to_streamlit(width=1350, height=700)
+        min3 = st.checkbox("30 Min")
+        if min3:
+            selected_dfs.append(df2[2])
 
-with tab3:
-    df_interval = pd.concat(df2[0:12], ignore_index=True)
-    Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(df_interval, x="Lon", y="Lat", layer_name="Marcadores") 
-    Map.to_streamlit(width=1350, height=700)
+        min4 = st.checkbox("40 Min")
+        if min4:
+            selected_dfs.append(df2[3])
 
-with tab4:
-    df_interval = pd.concat(df2[0:18], ignore_index=True)
-    Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(df_interval, x="Lon", y="Lat", layer_name="Marcadores") 
-    Map.to_streamlit(width=1350, height=700)
+        min5 = st.checkbox("50 Min")
+        if min5:
+            selected_dfs.append(df2[4])
 
-with tab5:
-    df_interval = pd.concat(df2[0:24], ignore_index=True)
-    Map = leafmap.Map(center=[-15.7801, -47.9292], zoom=3, tiles='cartodbdark_matter')
-    Map.add_points_from_xy(df_interval, x="Lon", y="Lat", layer_name="Marcadores") 
-    Map.to_streamlit(width=1350, height=700)
+        st.divider()
+
+    # Concatenar todos os DataFrames
+    if selected_dfs:
+        concatenated_df = pd.concat(selected_dfs, ignore_index=True)
+
+        # acessar a coluna 'Satelite'
+        sat = concatenated_df['Satelite'].unique().tolist()
+        selec = st.sidebar.selectbox('Selecione um Satelite', sat)
+        dfiltrado = concatenated_df[concatenated_df['Satelite'] == selec]
+
+        Map = leafmap.Map(center=[-19, -60], zoom=4, tiles='cartodbdark_matter')
+
+        Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")
+
+        with col1:
+            Map.to_streamlit(width=1450, height=775)
