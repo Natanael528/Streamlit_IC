@@ -7,7 +7,7 @@ import leafmap.foliumap as leafmap
 st.set_page_config(layout='wide',
                    page_icon=':fire:',
                    page_title='Unifei Queimadas',
-                   initial_sidebar_state='collapsed',
+                   initial_sidebar_state='expanded',
                    )
 
 with open('style.css')as f:
