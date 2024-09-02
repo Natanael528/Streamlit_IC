@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
+from datetime import date
 import plotly.express as px
 
 st.set_page_config(layout='wide',
@@ -85,8 +85,8 @@ with st.sidebar:
         estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
 
         # Seleciona a "DATA"
-        data_inicial = st.date_input('Data **INICIAL**:', datetime.date(2003, 1, 1))
-        data_final = st.date_input('Data **FINAL**:', datetime.date(2024, 8, 16))
+        data_inicial = st.date_input('Data **INICIAL**:', date(2003, 1, 1))
+        data_final = st.date_input('Data **FINAL**:', date(2024, 9, 1))
 
         # filtra por Data
         df_filtrado = df.loc[str(data_inicial):str(data_final)]
