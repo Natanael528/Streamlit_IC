@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime,timedelta
 import leafmap.foliumap as leafmap
+import folium
 
 
 st.set_page_config(layout='wide',
@@ -41,6 +42,8 @@ def load_data2():
             df = pd.read_csv(f'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/10min/focos_10min_{data}.csv', usecols=(['data','lat', 'lon', 'satelite']))
             df = df.rename(columns={'data':'Data','lat':'Lat','lon':'Lon','satelite':'Satelite'})
             df['Data'] = pd.to_datetime(df['Data'])
+            df['Data'] = df['Data'] - pd.to_timedelta(3, unit='h')
+            df['Hora'] = df['Data'].dt.time
             df.set_index('Data', inplace=True)
 
             dfs.append(df)
@@ -49,7 +52,6 @@ def load_data2():
             continue
         
         df = pd.concat(dfs)
-    
     return dfs
 
 def convert_df(dfd): #converter arquivos para donwload
@@ -96,48 +98,76 @@ if periodo == ('Diário'):
 else:
     st.title('Focos de queimadas Horário')  
      
-    col1, col2 = st.columns([8, 1.4], vertical_alignment="bottom") #divide a pagina em duas colunas com tamanhos diferentes
+    col1, col2 = st.columns([9, 1.4], vertical_alignment="top") #divide a pagina em duas colunas com tamanhos diferentes
 
     df2 = load_data2()
+    
     selected_dfs = []
-    with col2: #deixa no canto direito as selectboxs 
+    
+    colors = ["red", "red", "orange", "green", "blue"]  # Cores para diferenciar os DataFrames
+    
+    with col2:  # Coloca os checkboxes na coluna da direita
         st.divider()
         st.text('Selecione o Período')
 
-        min1 = st.checkbox("10 Min", value=True)
+        min1 = st.checkbox(":red[***10 Min***]", value=True)
         if min1:
+            df2[0]['color'] = colors[0]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[0])
 
-        min2 = st.checkbox("20 Min")
+        min2 = st.checkbox(":red[***20 Min***]")
         if min2:
+            df2[1]['color'] = colors[1]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[1])
 
-        min3 = st.checkbox("30 Min")
+        min3 = st.checkbox(":orange[***30 Min***]")
         if min3:
+            df2[2]['color'] = colors[2]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[2])
 
-        min4 = st.checkbox("40 Min")
+        min4 = st.checkbox(":green[***40 Min***]")
         if min4:
+            df2[3]['color'] = colors[3]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[3])
 
-        min5 = st.checkbox("50 Min")
+        min5 = st.checkbox(":blue[***50 Min***]")
         if min5:
+            df2[4]['color'] = colors[4]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[4])
-
         st.divider()
 
-    # Concatenar todos os DataFrames
-    if selected_dfs:
+    
+    if selected_dfs:# Concatenar todos os DataFrames
         concatenated_df = pd.concat(selected_dfs, ignore_index=True)
 
-        # acessar a coluna 'Satelite'
         sat = concatenated_df['Satelite'].unique().tolist()
-        selec = st.sidebar.selectbox('Selecione um Satelite', sat)
-        dfiltrado = concatenated_df[concatenated_df['Satelite'] == selec]
+        sat.insert(0, 'Todos Satélites')
+        selec = st.sidebar.selectbox('Selecione um Satélite', sat)
 
-        Map = leafmap.Map(center=[-19, -60], zoom=4, tiles='cartodbdark_matter')
+        if selec == 'Todos Satélites':
+            dfiltrado = concatenated_df  # Sem filtragem
+        else:
+            dfiltrado = concatenated_df[concatenated_df['Satelite'] == selec]
 
-        Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")
 
+
+        # Map = leafmap.Map(center=[-25, -55], zoom=4, tiles='cartodbdark_matter')
+        # Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")
+        # with col1:
+        #     Map.to_streamlit(width=1500, height=775)
+
+            
+        Map = leafmap.Map(center=[-15, -55], zoom=4, tiles='cartodbdark_matter') #legal ta
+
+        # Adiciona pontos ao mapa com cores diferenciadas e informações no popup
+        for _, row in dfiltrado.iterrows():
+            popup_text = f"Hora: {row['Hora']}<br>Lat:{row['Lat']}<br>Lon:{row['Lon']}<br>Satelite:{row['Satelite']}"
+            folium.Marker(
+                location=[row['Lat'], row['Lon']],
+                popup=popup_text,
+                icon =folium.Icon(color=row['color'])
+            ).add_to(Map)
+
+        # Exibindo o mapa
         with col1:
-            Map.to_streamlit(width=1450, height=775)
+            Map.to_streamlit(width=1500, height=775)

@@ -8,3 +8,4 @@ ipyleaflet
 proplot
 datetime
 timedelta
+folium
