@@ -32,7 +32,7 @@ def load_data(): #dados principais mensais
 def load_data2():
     dfs = []
     for i in range(0, 50, 10):
-        data_anterior = datetime.now() - timedelta(minutes=i)
+        data_anterior = datetime.now() - timedelta(hours=-3,minutes=i)
         
         # Arredondar o tempo para o múltiplo de 10 minutos
         data = data_anterior.replace(minute=(data_anterior.minute // 10) * 10, second=0, microsecond=0).strftime("%Y%m%d_%H%M") 
@@ -50,7 +50,7 @@ def load_data2():
             
         except Exception as e:
             continue
-        
+        print(data)
         df = pd.concat(dfs)
     return dfs
 
