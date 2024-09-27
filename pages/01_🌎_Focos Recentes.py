@@ -31,7 +31,7 @@ def load_data(): #dados principais mensais
 
 def load_data2():
     dfs = []
-    for i in range(0, 50, 10):
+    for i in range(0, 60, 10):
         data_anterior = datetime.now() - timedelta(hours=0,minutes=i)
         
         # Arredondar o tempo para o múltiplo de 10 minutos
@@ -60,7 +60,7 @@ def convert_df(dfd): #converter arquivos para donwload
 
 
 with st.sidebar:
-    periodo = st.radio('Selecione o Período do dado', ['Horário','Diário'])
+    periodo = st.radio('Selecione o Período do dado', ['Recentes','Diário'])
 
 
 if periodo == ('Diário'):
@@ -101,10 +101,10 @@ else:
     col1, col2 = st.columns([9, 1.4], vertical_alignment="top") #divide a pagina em duas colunas com tamanhos diferentes
 
     df2 = load_data2()
-    
+    df2 
     selected_dfs = []
     
-    colors = ["red", "red", "orange", "green", "blue"]  # Cores para diferenciar os DataFrames
+    colors = ["red", "orange", "green", "blue", "darkblue"]  # Cores para diferenciar os DataFrames
     
     with col2:  # Coloca os checkboxes na coluna da direita
         st.divider()
@@ -115,22 +115,22 @@ else:
             df2[0]['color'] = colors[0]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[0])
 
-        min2 = st.checkbox(":red[***20 Min***]")
+        min2 = st.checkbox(":orange[***20 Min***]")
         if min2:
             df2[1]['color'] = colors[1]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[1])
 
-        min3 = st.checkbox(":orange[***30 Min***]")
+        min3 = st.checkbox(":green[***30 Min***]")
         if min3:
             df2[2]['color'] = colors[2]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[2])
 
-        min4 = st.checkbox(":green[***40 Min***]")
+        min4 = st.checkbox(":blue[***40 Min***]")
         if min4:
             df2[3]['color'] = colors[3]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[3])
 
-        min5 = st.checkbox(":blue[***50 Min***]")
+        min5 = st.checkbox(":darkblue[***50 Min***]")
         if min5:
             df2[4]['color'] = colors[4]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[4])
@@ -148,8 +148,7 @@ else:
             dfiltrado = concatenated_df  # Sem filtragem
         else:
             dfiltrado = concatenated_df[concatenated_df['Satelite'] == selec]
-
-
+        dfiltrado
 
         # Map = leafmap.Map(center=[-25, -55], zoom=4, tiles='cartodbdark_matter')
         # Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")
