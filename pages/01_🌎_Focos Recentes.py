@@ -22,8 +22,8 @@ st.logo('Logos/cropped-simbolo_RGB.png',
 def load_data(): #dados principais mensais
     
     data = datetime.now().strftime("%Y%m")
-    df = pd.read_csv(f'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/focos_mensal_br_{data}.csv', usecols=(['data_hora_gmt','lat','lon','satelite','bioma']))
-    df = df.rename(columns={'data_hora_gmt':'Data','lat':'Lat','lon':'Lon','satelite':'Satelite','bioma':'Bioma'}) 
+    df = pd.read_csv(f'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/focos_mensal_br_{data}.csv', usecols=(['data_hora_gmt','lat','lon','satelite','bioma','municipio','frp']))
+    df = df.rename(columns={'data_hora_gmt':'Data','lat':'Lat','lon':'Lon','satelite':'Satelite','bioma':'Bioma','municipio':'Municipio','frp':'FRP'}) 
     df['Data'] = pd.to_datetime(df['Data'])
     df.set_index('Data', inplace=True)
      
@@ -31,7 +31,7 @@ def load_data(): #dados principais mensais
 
 def load_data2():
     dfs = []
-    for i in range(0, 60, 10):
+    for i in range(0, 50, 10):
         data_anterior = datetime.now() - timedelta(hours=0,minutes=i)
         
         # Arredondar o tempo para o múltiplo de 10 minutos
@@ -42,14 +42,15 @@ def load_data2():
             df = pd.read_csv(f'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/10min/focos_10min_{data}.csv', usecols=(['data','lat', 'lon', 'satelite']))
             df = df.rename(columns={'data':'Data','lat':'Lat','lon':'Lon','satelite':'Satelite'})
             df['Data'] = pd.to_datetime(df['Data'])
-            df['Data'] = df['Data'] - pd.to_timedelta(3, unit='h')
+            df['Data'] = df['Data'] - pd.to_timedelta(2.5, unit='h')
             df['Hora'] = df['Data'].dt.time
             df.set_index('Data', inplace=True)
 
             dfs.append(df)
             
         except Exception as e:
-            continue
+            empty_df = pd.DataFrame(columns=['Data', 'Lat', 'Lon', 'Satelite', 'Hora'])
+            dfs.append(empty_df)
         print(data)
         df = pd.concat(dfs)
     return dfs
@@ -101,10 +102,10 @@ else:
     col1, col2 = st.columns([9, 1.4], vertical_alignment="top") #divide a pagina em duas colunas com tamanhos diferentes
 
     df2 = load_data2()
-    df2 
+    
     selected_dfs = []
     
-    colors = ["red", "orange", "green", "blue", "darkblue"]  # Cores para diferenciar os DataFrames
+    colors = ["red", "orange", "green", "blue", "purple"]  # Cores para diferenciar os DataFrames
     
     with col2:  # Coloca os checkboxes na coluna da direita
         st.divider()
@@ -130,7 +131,7 @@ else:
             df2[3]['color'] = colors[3]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[3])
 
-        min5 = st.checkbox(":darkblue[***50 Min***]")
+        min5 = st.checkbox("50 Min")
         if min5:
             df2[4]['color'] = colors[4]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[4])
@@ -148,7 +149,7 @@ else:
             dfiltrado = concatenated_df  # Sem filtragem
         else:
             dfiltrado = concatenated_df[concatenated_df['Satelite'] == selec]
-        dfiltrado
+
 
         # Map = leafmap.Map(center=[-25, -55], zoom=4, tiles='cartodbdark_matter')
         # Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")
@@ -164,7 +165,7 @@ else:
             folium.Marker(
                 location=[row['Lat'], row['Lon']],
                 popup=popup_text,
-                icon =folium.Icon(color=row['color'])
+                icon =folium.Icon(color=row['color'],icon="fire")
             ).add_to(Map)
 
         # Exibindo o mapa
