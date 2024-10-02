@@ -32,7 +32,7 @@ def load_data(): #dados principais mensais
 def load_data2():
     dfs = []
     for i in range(0, 50, 10):
-        data_anterior = datetime.now() - timedelta(hours=0,minutes=i)
+        data_anterior = datetime.now() - timedelta(hours=-0,minutes=i)
         
         # Arredondar o tempo para o múltiplo de 10 minutos
         data = data_anterior.replace(minute=(data_anterior.minute // 10) * 10, second=0, microsecond=0).strftime("%Y%m%d_%H%M") 
@@ -58,7 +58,6 @@ def load_data2():
 def convert_df(dfd): #converter arquivos para donwload
     return dfd.to_csv().encode("utf-8")
 ##############################################################################################################################################################
-
 
 with st.sidebar:
     periodo = st.radio('Selecione o Período do dado', ['Recentes','Diário'])
@@ -89,7 +88,7 @@ if periodo == ('Diário'):
     selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= indice)
     dfiltrado = df[df['Satelite'] == selec]
 
-    Map = leafmap.Map(center=[-19, -60], zoom=4, tiles='cartodbdark_matter')
+    Map = leafmap.Map(center=[-27, -60], zoom=4, tiles='cartodbdark_matter')
     Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")             
     Map.to_streamlit(width=1500, height=700)
     
@@ -109,34 +108,38 @@ else:
     
     with col2:  # Coloca os checkboxes na coluna da direita
         st.divider()
-        st.text('Selecione o Período')
+        st.markdown("**Focos de incêndio**")
 
-        min1 = st.checkbox(":red[***10 Min***]", value=True)
+        min1 = st.checkbox(":red[***Últimos 10 Minutos***]", value=True)
         if min1:
             df2[0]['color'] = colors[0]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[0])
-
-        min2 = st.checkbox(":orange[***20 Min***]")
+        min2 = st.checkbox(":orange[***Últimos 20 Minutos***]")
         if min2:
             df2[1]['color'] = colors[1]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[1])
 
-        min3 = st.checkbox(":green[***30 Min***]")
+        min3 = st.checkbox(":green[***Últimos 30 Minutos***]")
         if min3:
             df2[2]['color'] = colors[2]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[2])
 
-        min4 = st.checkbox(":blue[***40 Min***]")
+        min4 = st.checkbox(":blue[***Últimos 40 Minutos***]")
         if min4:
             df2[3]['color'] = colors[3]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[3])
 
-        min5 = st.checkbox("50 Min")
+        min5 = st.checkbox(":violet[***Últimos 50 Minutos***]")
         if min5:
             df2[4]['color'] = colors[4]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[4])
-        st.divider()
+            
+        st.markdown("**Última atualização:**")
+        
+        if selected_dfs and selected_dfs[0].empty == False:
+            st.markdown(selected_dfs[0].index[0])
 
+        st.divider()
     
     if selected_dfs:# Concatenar todos os DataFrames
         concatenated_df = pd.concat(selected_dfs, ignore_index=True)
@@ -157,7 +160,7 @@ else:
         #     Map.to_streamlit(width=1500, height=775)
 
             
-        Map = leafmap.Map(center=[-15, -55], zoom=4, tiles='cartodbdark_matter') #legal ta
+        Map = leafmap.Map(center=[-27, -55], zoom=4, tiles='cartodbdark_matter') #legal ta
 
         # Adiciona pontos ao mapa com cores diferenciadas e informações no popup
         for _, row in dfiltrado.iterrows():
