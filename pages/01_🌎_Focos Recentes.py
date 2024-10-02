@@ -32,7 +32,7 @@ def load_data(): #dados principais mensais
 def load_data2():
     dfs = []
     for i in range(0, 50, 10):
-        data_anterior = datetime.now() - timedelta(hours=-0,minutes=i)
+        data_anterior = datetime.now() - timedelta(hours=0,minutes=i)
         
         # Arredondar o tempo para o múltiplo de 10 minutos
         data = data_anterior.replace(minute=(data_anterior.minute // 10) * 10, second=0, microsecond=0).strftime("%Y%m%d_%H%M") 
@@ -88,7 +88,7 @@ if periodo == ('Diário'):
     selec = st.sidebar.selectbox('Selecione um Satelite', sat, index= indice)
     dfiltrado = df[df['Satelite'] == selec]
 
-    Map = leafmap.Map(center=[-27, -60], zoom=4, tiles='cartodbdark_matter')
+    Map = leafmap.Map(center=[-19, -60], zoom=4, tiles='cartodbdark_matter')
     Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")             
     Map.to_streamlit(width=1500, height=700)
     
@@ -134,11 +134,19 @@ else:
             df2[4]['color'] = colors[4]  # Adiciona cor ao DataFrame
             selected_dfs.append(df2[4])
             
-        st.markdown("**Última atualização:**")
-        
-        if selected_dfs and selected_dfs[0].empty == False:
-            st.markdown(selected_dfs[0].index[0])
 
+        ultimaatt = []
+        if selected_dfs:  # Verifica se há DataFrames selecionados
+            for df in selected_dfs:
+                if not df.empty:  # Verifica se o DataFrame não está vazio
+                    primeira_linha = df.index[0]  # Pega a primeira linha do DataFrame
+                    ultimaatt.append(primeira_linha)
+
+        # Verifica se a lista 'ultimaatt' não está vazia
+        if ultimaatt:
+            st.markdown("**Última atualização:**")  
+            st.markdown(ultimaatt[0])  # Plota a mensagem com o primeiro elemento da lista
+        
         st.divider()
     
     if selected_dfs:# Concatenar todos os DataFrames
@@ -160,7 +168,7 @@ else:
         #     Map.to_streamlit(width=1500, height=775)
 
             
-        Map = leafmap.Map(center=[-27, -55], zoom=4, tiles='cartodbdark_matter') #legal ta
+        Map = leafmap.Map(center=[-15, -55], zoom=4, tiles='cartodbdark_matter') #legal ta
 
         # Adiciona pontos ao mapa com cores diferenciadas e informações no popup
         for _, row in dfiltrado.iterrows():
