@@ -51,7 +51,6 @@ def load_data2():
         except Exception as e:
             empty_df = pd.DataFrame(columns=['Data', 'Lat', 'Lon', 'Satelite', 'Hora'])
             dfs.append(empty_df)
-        print(data)
         df = pd.concat(dfs)
     return dfs
 

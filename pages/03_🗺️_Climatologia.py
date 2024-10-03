@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import proplot as pplt
 
 st.set_page_config(layout='wide',
                    page_icon=':fire:',
@@ -43,28 +42,3 @@ def convert_df(df):
 #carrega o dataframe
 df = load_data()
 data = df.groupby(pd.Grouper(freq='1M')).count()['lat']
-
-# cria moldura da figura
-fig, ax = pplt.subplots(figsize=(8, 3), sharey=False, tight=True)
-
-# plota os focos de caloe
-ax.plot(data.index,
-        data.values,
-        color='bright red',
-        marker='*',
-        label='Total')
-
-# formatação dos eixos
-ax.format(title='Total por Hora: MG - 2011 à 2020',
-          xlabel='Hora Local',
-          ylabel='Focos de Calor',
-          xticks=2,
-          xtickminor=False,
-          ytickminor=False,
-          xlim=(-1,24))
-
-# legendas
-ax.legend(frameon=False, prop={'size': 15})
-
-# exibe a figura na tela
-pplt.to_streamlit(width=1350, height=700)
