@@ -52,7 +52,7 @@ def load_data2():
             empty_df = pd.DataFrame(columns=['Data', 'Lat', 'Lon', 'Satelite', 'Hora'])
             dfs.append(empty_df)
         df = pd.concat(dfs)
-        print (data)
+    print (data)
     return dfs
 
 def convert_df(dfd): #converter arquivos para donwload
