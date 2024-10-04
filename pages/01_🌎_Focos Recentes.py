@@ -36,7 +36,7 @@ def load_data2():
         
         # Arredondar o tempo para o múltiplo de 10 minutos
         data = data_anterior.replace(minute=(data_anterior.minute // 10) * 10, second=0, microsecond=0).strftime("%Y%m%d_%H%M") 
-        
+        print (data)
         try: # Tentar carregar o CSV
             
             df = pd.read_csv(f'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/10min/focos_10min_{data}.csv', usecols=(['data','lat', 'lon', 'satelite']))
@@ -52,7 +52,7 @@ def load_data2():
             empty_df = pd.DataFrame(columns=['Data', 'Lat', 'Lon', 'Satelite', 'Hora'])
             dfs.append(empty_df)
         df = pd.concat(dfs)
-    print (data)
+    
     return dfs
 
 def convert_df(dfd): #converter arquivos para donwload
