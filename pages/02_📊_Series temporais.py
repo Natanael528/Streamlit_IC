@@ -1,7 +1,10 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
+import numpy as np
 import plotly.express as px
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 st.set_page_config(layout='wide',
                    page_icon=':fire:',
@@ -13,7 +16,7 @@ with open('style.css')as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
 st.logo('Logos/cropped-simbolo_RGB.png',
         link= 'https://meteorologia.unifei.edu.br')
-
+####################################################################### Download dados Por Funções ###########################################################
 @st.cache_data
 def load_data():
     # Lendo todos os dataframes até 2023
@@ -46,23 +49,34 @@ def load_data():
     # Primeiro DataFrame
     df = pd.concat([df_lat, df_lon, df_municipios, df_estados, df_biomas], axis=1)
     df['data'] = pd.to_datetime(df['data'])
-    df.set_index('data', inplace=True)
-    df = df.sort_values('data')  
+  
     
+    df['Ano'] = df['data'].dt.year
+    df['Mês'] = df['data'].dt.month 
+       
+    df.set_index('data', inplace=True)
+    df = df.sort_values('data')    
     return df
 
-@st.cache_data
+# Função para filtrar por estado
+def agrupar_por_estado(df, estado_selecionado):
+
+    df_filtrado = df[df['estado'] == estado_selecionado]
+    
+    # Agrupar os dados por Ano e Mês, contando o número de focos de calor
+    dfg = df_filtrado.groupby(['Ano', 'Mês']).size().unstack(fill_value=0)
+    
+    return dfg
+
 def convert_df(df):
     return df.to_csv(index=False)
 
+##############################################################################################################################################################
 #carrega o dataframe
 df = load_data()
 
-# sidebar
 with st.sidebar:
-    rad = st.radio('Serie temporal',
-                   ['Brasil','Por Estado'],
-                   )
+    rad = st.radio('Serie temporal',['Brasil','Por Estado'])
     if rad == 'Brasil':
         
         # seleciona a "DATA"
@@ -91,10 +105,11 @@ with st.sidebar:
         # filtra por Data
         df_filtrado = df.loc[str(data_inicial):str(data_final)]
 
-        # filtra por Estado  
+        # filtra por Estado
         df_filtrado = df_filtrado[df_filtrado['estado'] == estado_selecionado]
         
-        
+        dfg = agrupar_por_estado(df, estado_selecionado)# Agrupar e filtrar os dados pelo estado selecionado
+
 
 # mostra o estado
 if rad == 'Por Estado':
@@ -108,7 +123,8 @@ else:
 col1, col2 = st.columns(2)  # Isto significa 2 
 col3, col4 = st.columns(2)  # Isto significa 2 
 col5, col6 = st.columns(2)
-col7, col8, col9 = st.columns([2,6,2])
+col7, col8 = st.columns(2)
+col9, col10, col11 = st.columns([2,6,2])
 
 # DIÁRIO TOTAL
 diaria = df_filtrado.groupby(pd.Grouper(freq='1D')).count()['lat']
@@ -226,7 +242,7 @@ if rad == 'Brasil':
                'yanchor': 'top',
                'font_size': 20,
                'font_color': 'white'})
-    col8.plotly_chart(fig_max_bioma, use_container_width=False, width=400, height=300)
+    col10.plotly_chart(fig_max_bioma, use_container_width=False, width=400, height=300)
     
 else:
     
@@ -248,4 +264,38 @@ else:
                 'font_size': 20,
                 'font_color': 'white'})
     col8.plotly_chart(fig_max_municipio, use_container_width=False, width=400, height=300)
-        
+
+##############################################################################################################################################################
+    fig, ax = plt.subplots(figsize=(12,7))
+
+    sns.heatmap(dfg,
+                vmin=0.1, vmax=3000,
+                cmap='gist_heat_r',
+                xticklabels=['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                yticklabels=np.arange(dfg.index.min(), dfg.index.max() + 1, 1),
+                linewidth=0.2,
+                linecolor='white',
+                cbar_kws={'label': ' ',
+                        'shrink': 1.0,
+                        'pad': 0.01,
+                        'orientation': 'vertical'},
+                annot=True, fmt=".0f",
+                annot_kws={'color': 'gray',
+                        'fontsize': 13,
+                        'fontweight': 'medium'})
+
+    # Configurações da barra de cores
+    cbar = ax.collections[0].colorbar
+    cbar.ax.tick_params(labelsize=15, axis="both")
+    cbar.set_label('Satélite AQUA / Fonte: INPE', fontsize=14)
+    cbar.ax.minorticks_off()
+
+    # Título
+    ax.set_title(f'Focos de Calor em {estado_selecionado}', fontsize=16, color='black', fontweight='bold', loc='left')
+
+    # Ajustar o layout e mostrar a figura
+    plt.yticks(rotation=0, fontsize=13)
+    plt.xticks(rotation=0, fontsize=13)
+
+    plt.tight_layout()
+    col7.pyplot(fig)   

@@ -79,3 +79,7 @@
 .st-emotion-cache-ocqkz7 .main-svg .gtitle {
     fill: white !important;
 }
+/*#### Imagem serie temporal*/
+.st-emotion-cache-1v0mbdj img{
+    border-radius: 1.5rem; /*arredondar os cantos*/
+}
