@@ -99,7 +99,7 @@ with st.sidebar:
         estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
 
         # Seleciona a "DATA"
-        data_inicial = st.date_input('Data **INICIAL**:', date(2003, 1, 1))
+        data_inicial = st.date_input('Data **INICIAL**:', date(2002, 1, 1))
         data_final = st.date_input('Data **FINAL**:', date(2024, 9, 1))
 
         # filtra por Data
@@ -109,7 +109,8 @@ with st.sidebar:
         df_filtrado = df_filtrado[df_filtrado['estado'] == estado_selecionado]
         
         dfg = agrupar_por_estado(df, estado_selecionado)# Agrupar e filtrar os dados pelo estado selecionado
-
+        
+        dfg = dfg.loc[str(data_inicial):str(data_final)]
 
 # mostra o estado
 if rad == 'Por Estado':
@@ -267,7 +268,8 @@ else:
 
 ##############################################################################################################################################################
     fig, ax = plt.subplots(figsize=(12,7))
-
+    dfg
+    df_filtrado
     sns.heatmap(dfg,
                 vmin=0.1, vmax=3000,
                 cmap='gist_heat_r',
