@@ -99,18 +99,19 @@ with st.sidebar:
         estado_selecionado = st.selectbox('Selecione o **ESTADO**:', estados)
 
         # Seleciona a "DATA"
-        data_inicial = st.date_input('Data **INICIAL**:', date(2002, 1, 1))
+        data_inicial = st.date_input('Data **INICIAL**:', date(2003, 1, 1))
         data_final = st.date_input('Data **FINAL**:', date(2024, 9, 1))
-
         # filtra por Data
         df_filtrado = df.loc[str(data_inicial):str(data_final)]
-
+        anoini = data_inicial.year
+        anofin = data_final.year
         # filtra por Estado
         df_filtrado = df_filtrado[df_filtrado['estado'] == estado_selecionado]
         
         dfg = agrupar_por_estado(df, estado_selecionado)# Agrupar e filtrar os dados pelo estado selecionado
         
-        dfg = dfg.loc[str(data_inicial):str(data_final)]
+        dfg = dfg.loc[str(anoini):str(anofin)]
+
 
 # mostra o estado
 if rad == 'Por Estado':
@@ -267,6 +268,7 @@ else:
     col8.plotly_chart(fig_max_municipio, use_container_width=False, width=400, height=300)
 
 ##############################################################################################################################################################
+    dfg
     fig, ax = plt.subplots(figsize=(12,7))
     sns.heatmap(dfg,
                 vmin=0.1, vmax=3000,
