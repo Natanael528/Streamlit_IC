@@ -268,7 +268,6 @@ else:
     col8.plotly_chart(fig_max_municipio, use_container_width=False, width=400, height=300)
 
 ##############################################################################################################################################################
-    dfg
     fig, ax = plt.subplots(figsize=(12,7))
     sns.heatmap(dfg,
                 vmin=0.1, vmax=3000,
