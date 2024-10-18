@@ -11,4 +11,3 @@ timedelta
 folium
 seaborn
 salem
-shapely.geometry
