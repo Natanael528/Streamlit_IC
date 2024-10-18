@@ -103,14 +103,13 @@ with st.sidebar:
         data_final = st.date_input('Data **FINAL**:', date(2024, 9, 1))
         # filtra por Data
         df_filtrado = df.loc[str(data_inicial):str(data_final)]
-        anoini = data_inicial.year
-        anofin = data_final.year
+
         # filtra por Estado
         df_filtrado = df_filtrado[df_filtrado['estado'] == estado_selecionado]
         
         dfg = agrupar_por_estado(df, estado_selecionado)# Agrupar e filtrar os dados pelo estado selecionado
         
-        dfg = dfg.loc[str(anoini):str(anofin)]
+        dfg = dfg.loc[str(data_inicial.year):str(data_final.year)]
 
 
 # mostra o estado
@@ -122,8 +121,8 @@ else:
 
 
 # esta parte será usada para os gráficos
-col1, col2 = st.columns(2)  # Isto significa 2 
-col3, col4 = st.columns(2)  # Isto significa 2 
+col1, col2 = st.columns(2)
+col3, col4 = st.columns(2)
 col5, col6 = st.columns(2)
 col7, col8 = st.columns(2)
 col9, col10, col11 = st.columns([2,6,2])
