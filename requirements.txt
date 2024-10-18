@@ -10,3 +10,4 @@ datetime
 timedelta
 folium
 seaborn
+salem
