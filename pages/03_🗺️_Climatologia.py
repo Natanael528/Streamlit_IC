@@ -1,11 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import salem
 import xarray as xr
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
-
+import geopandas as gpd
 
 
 # Configuração da página
@@ -60,7 +59,7 @@ col9, col10, col11 = st.columns([2,8,2])
 
 ##############################################################ALGUNS CALCS################################################################
 # Leitura do shapefile do Brasil
-shapefile_brasil = salem.read_shapefile('https://github.com/evmpython/shapefile/raw/main/brasil/BRAZIL.shp')
+shapefile_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/brasil/BRAZIL.shp')
 
 # Limites do Brasil
 lonmin, lonmax, latmin, latmax = -75.0, -33.0, -35.0, 7.0
@@ -91,20 +90,15 @@ data_vars = {'focos': (('lat', 'lon'), focos, {'units': 'ocorrências/400km²', 
 coords = {'lat': lats, 'lon': lons, 'time': pd.to_datetime(f'{ano}-12')}
 files = xr.Dataset(data_vars=data_vars, coords=coords)
 
-##############################################################PLOTA A FIGURA################################################################
+# Plota a figura
 fig, ax = plt.subplots(figsize=(14, 12), facecolor='#a1a1a121')
-
-# limites do Brasil
-lonmin, lonmax, latmin, latmax = -75.0, -33.0, -35.0, 7.0
 
 # Definir limites do mapa
 ax.set_xlim(lonmin, lonmax)
 ax.set_ylim(latmin, latmax)
 
-
-cores = ['#262626', '#3d3835', '#4d423c', '#674f42', '#937260', '#b38871', '#cf9678', '#e78d5e', '#fdb99d']  # Adicione suas cores aqui
+cores = ['#262626', '#3d3835', '#4d423c', '#674f42', '#937260', '#b38871', '#cf9678', '#e78d5e', '#fdb99d']
 cmap = ListedColormap(cores)
-
 
 # Plota o mapa de focos
 map1 = ax.contourf(files['lon'],
@@ -117,142 +111,32 @@ map1 = ax.contourf(files['lon'],
 
 # Adiciona a barra de cores
 cbar = plt.colorbar(map1, ax=ax)
-cbar.set_label('Fonte: INPE/Pixel: 20km',color = 'white', fontsize=15)
+cbar.set_label('Fonte: INPE/Pixel: 20km', color='white', fontsize=15)
 cbar.set_ticks([0, 20, 50, 100, 150])
 cbar.set_ticklabels(['0','20', '50', '100', '150'])
 
-
-cbar.ax.yaxis.set_tick_params(color='white')  # Cor do rótulo da barra de cores
-cbar.ax.yaxis.label.set_color('white')  # Cor do rótulo da barra de cores
-cbar.ax.tick_params(colors='white')  # Cor dos números na colorbar
+cbar.ax.yaxis.set_tick_params(color='white')
+cbar.ax.yaxis.label.set_color('white')
+cbar.ax.tick_params(colors='white')
 
 # Título da figura
-ax.set_title('Acumulado de Focos', fontsize=20, weight='bold',color = 'white')
+ax.set_title('Acumulado de Focos', fontsize=20, weight='bold', color='white')
 
 # Adiciona subtítulo com o total de focos
 total = int(np.sum(files['focos']))
 ax.text(lonmin + 0.5, latmax - 1.2, f'Período = {ano} / Total de focos={total}', color='white', fontsize=14)
 
 # Plota contorno dos estados e do Brasil
-estados_brasil = salem.read_shapefile('https://github.com/evmpython/shapefile/raw/main/estados_do_brasil/BR_UF_2019.shp')
+estados_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/estados_do_brasil/BR_UF_2019.shp')
 estados_brasil.plot(edgecolor='gray', facecolor='none', linewidth=0.5, alpha=1, ax=ax)
 
-contorno_brasil = salem.read_shapefile('https://github.com/evmpython/shapefile/raw/main/brasil/BRAZIL.shp')
+contorno_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/brasil/BRAZIL.shp')
 contorno_brasil.plot(edgecolor='gray', facecolor='none', linewidth=0.5, alpha=1, ax=ax)
 
-
 # Configura cores dos rótulos dos eixos e ticks
-ax.xaxis.label.set_color('white')  # Cor do rótulo do eixo X
-ax.yaxis.label.set_color('white')  # Cor do rótulo do eixo Y
-ax.tick_params(axis='x', colors='white',labelsize=10)  # Cor dos ticks do eixo X
-ax.tick_params(axis='y', colors='white',labelsize=10)  # Cor dos ticks do eixo Y
-
+ax.xaxis.label.set_color('white')
+ax.yaxis.label.set_color('white')
+ax.tick_params(axis='x', colors='white', labelsize=10)
+ax.tick_params(axis='y', colors='white', labelsize=10)
 
 col10.pyplot(fig)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import plotly.graph_objects as go
-# import geopandas as gpd
-
-# # Limites do Brasil
-# lonmin, lonmax, latmin, latmax = -75.0, -33.0, -35.0, 7.0
-
-# lon = files['lon']  # Converte para lista
-# lat = files['lat']  # Converte para lista
-# focos = files['focos']  # Converte para lista
-
-# # Cria o gráfico de focos de calor
-# fig = go.Figure()
-
-# # Adiciona o mapa de focos usando Contour
-# fig.add_trace(go.Contour(
-#     z=focos,
-#     x=lon,
-#     y=lat,
-#     colorscale='Hot_r',
-#     zmin=0, zmax=160,
-#     contours=dict(
-#         coloring='heatmap',
-#         showlabels=True,
-#         labelfont=dict(size=12, color='white')
-#     ),
-#     colorbar=dict(
-#         title='Fonte: INPE/Pixel: 20km',
-#         tickvals=[20, 50, 100, 150],
-#         ticktext=['20', '50', '100', '150']
-#     ),
-# ))
-
-# # Adiciona as fronteiras dos estados e do Brasil
-# estados_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/estados_do_brasil/BR_UF_2019.shp')
-# contorno_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/brasil/BRAZIL.shp')
-
-# # Adiciona os estados
-# for _, state in estados_brasil.iterrows():
-#     fig.add_trace(go.Scattergeo(
-#         lon=state['geometry'].exterior.coords.xy[0],
-#         lat=state['geometry'].exterior.coords.xy[1],
-#         mode='lines',
-#         line=dict(color='gray', width=1),
-#         showlegend=False,
-#     ))
-
-# # Adiciona o contorno do Brasil
-# for _, country in contorno_brasil.iterrows():
-#     fig.add_trace(go.Scattergeo(
-#         lon=country['geometry'].exterior.coords.xy[0],
-#         lat=country['geometry'].exterior.coords.xy[1],
-#         mode='lines',
-#         line=dict(color='black', width=1),
-#         showlegend=False,
-#     ))
-
-# # Título e ajustes de layout
-# fig.update_layout(
-#     title={
-#         'text': f"Acumulado de Focos<br><sub>Período={ano} / Total de focos={int(np.sum(focos))}</sub>",
-#         'y': 0.95,
-#         'x': 0.01,
-#         'xanchor': 'left',
-#         'yanchor': 'top'
-#     },
-#     geo=dict(
-#         scope='south america',
-#         lonaxis=dict(range=[lonmin, lonmax]),
-#         lataxis=dict(range=[latmin, latmax]),
-#         showcoastlines=False,
-#         showland=False
-#     ),
-#     height=600,
-#     width=800
-# )
-
-# # Exibe o gráfico
-# fig.show()
-# st.plotly_chart(fig, width=400, height=300)

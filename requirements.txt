@@ -10,4 +10,4 @@ datetime
 timedelta
 folium
 seaborn
-salem
+geopandas
