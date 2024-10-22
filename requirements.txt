@@ -1,12 +1,13 @@
 streamlit
 plotly
 bs4
-# streamlit_folium
+xarray
+streamlit_folium
 setuptools
 leafmap
 ipyleaflet
 datetime
 timedelta
-# folium
+folium
 seaborn
 geopandas
