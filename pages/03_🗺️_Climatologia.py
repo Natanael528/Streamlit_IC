@@ -71,24 +71,33 @@ lats = np.arange(latmax, latmin, -delta)
 nlon = len(lons)
 nlat = len(lats)
 
-# seleciona a "DATA"
-anos_disponiveis = sorted(df.index.year.unique())
-ano = st.sidebar.selectbox('Ano Desejado', anos_disponiveis, index = 21)##############SELECBOX ANO ###################
 
-# Mapeamento dos números dos meses para os nomes dos meses
-meses_nomes = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 
-               'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
+with st.sidebar:
+    rad = st.radio('Climatologia',['Por Ano','Por Mês'])
+    if rad == 'Por Ano':
 
-# Seleciona os meses disponíveis no DataFrame
-mes_disponiveis = sorted(df.index.month.unique())
+        # seleciona a "DATA"
+        anos_disponiveis = sorted(df.index.year.unique())
+        selec = st.sidebar.selectbox('Ano Desejado', anos_disponiveis, index = 21)##############SELECBOX ANO ###################
+        dataselec = selec
+        df_selec = df.loc[f'{selec}']
 
-# Exibe o selectbox com os nomes dos meses, mas retorna o número do mês
-mes_selecionado = st.sidebar.selectbox('Mes Desejado', mes_disponiveis, format_func=lambda x: meses_nomes[x-1])
-
-st.sidebar.divider()
-df_selec = df.loc[f'{ano}-{mes_selecionado}']
+    else:
+        # Mapeamento dos números dos meses para os nomes dos meses
+        meses_nomes = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 
+                    'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
+        # Seleciona os meses disponíveis no DataFrame
+        mes_disponiveis = sorted(df.index.month.unique())
+        
+        # Exibe o selectbox com os nomes dos meses, mas retorna o número do mês
+        selec = st.sidebar.selectbox('Mes Desejado', mes_disponiveis, format_func=lambda x: meses_nomes[x-1])
+        dataselec = meses_nomes[selec - 1]
+        st.sidebar.divider()
+        df_selec = df[df.index.month == selec]
+        
+   
+        
 focos_lon, focos_lat = df_selec['lon'].values, df_selec['lat'].values
-
 focos = np.zeros((nlat, nlon))
 
 for lonfoco, latfoco in zip(focos_lon, focos_lat):
@@ -97,7 +106,7 @@ for lonfoco, latfoco in zip(focos_lon, focos_lat):
 
 # Gera arquivo netcdf
 data_vars = {'focos': (('lat', 'lon'), focos, {'units': 'ocorrências/400km²', 'long_name': 'Focos de Calor'})}
-coords = {'lat': lats, 'lon': lons, 'time': pd.to_datetime(f'{ano}-12')}
+coords = {'lat': lats, 'lon': lons, 'time': pd.to_datetime(df_selec.index)}
 files = xr.Dataset(data_vars=data_vars, coords=coords)
 
 
@@ -133,15 +142,9 @@ map1 = ax.contourf(files['lon'],
 # Adiciona a barra de cores
 cbar = plt.colorbar(map1, ax=ax)
 cbar.set_label('Fonte: INPE/Pixel: 20km', color='white', fontsize=15)
-# cbar.set_ticks([0, 20, 50, 100, 150])
-# cbar.set_ticklabels(['0','20', '50', '100', '150'])
 
 # Remover o contorno da barra de cores
 cbar.outline.set_visible(False)
-
-
-# Configurar para que não haja "tamanho" nos ticks (remove borda branca)
-cbar.ax.tick_params(size=0)
 
 # Configurações de cor da barra de cores
 cbar.ax.yaxis.set_tick_params(color='white')
@@ -153,7 +156,7 @@ ax.set_title('Acumulado de Focos', fontsize=20, weight='bold', color='white')
 
 # Adiciona subtítulo com o total de focos
 total = int(np.sum(files['focos']))
-ax.text(lonmin + 0.3, latmax - 1.2, f'Período = {ano}/{mes_selecionado}', color='white', fontsize=14)
+ax.text(lonmin + 0.3, latmax - 1.2, f'Período = {dataselec}', color='white', fontsize=14)
 ax.text(lonmin + 0.3, latmax - 2.2, f'Total de focos = {total}', color='white', fontsize=14)
 
 
