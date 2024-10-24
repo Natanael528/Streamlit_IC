@@ -74,9 +74,19 @@ nlat = len(lats)
 # seleciona a "DATA"
 anos_disponiveis = sorted(df.index.year.unique())
 ano = st.sidebar.selectbox('Ano Desejado', anos_disponiveis, index = 21)##############SELECBOX ANO ###################
-st.sidebar.divider()
 
-df_selec = df.loc[f'{ano}']
+# Mapeamento dos números dos meses para os nomes dos meses
+meses_nomes = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 
+               'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
+
+# Seleciona os meses disponíveis no DataFrame
+mes_disponiveis = sorted(df.index.month.unique())
+
+# Exibe o selectbox com os nomes dos meses, mas retorna o número do mês
+mes_selecionado = st.sidebar.selectbox('Mes Desejado', mes_disponiveis, format_func=lambda x: meses_nomes[x-1])
+
+st.sidebar.divider()
+df_selec = df.loc[f'{ano}-{mes_selecionado}']
 focos_lon, focos_lat = df_selec['lon'].values, df_selec['lat'].values
 
 focos = np.zeros((nlat, nlon))
@@ -90,12 +100,23 @@ data_vars = {'focos': (('lat', 'lon'), focos, {'units': 'ocorrências/400km²', 
 coords = {'lat': lats, 'lon': lons, 'time': pd.to_datetime(f'{ano}-12')}
 files = xr.Dataset(data_vars=data_vars, coords=coords)
 
+
+
+
+
+
 # Plota a figura
 fig, ax = plt.subplots(figsize=(14, 12), facecolor='#a1a1a121')
 
-# Definir limites do mapa
+# Definir limites do mapa com ajuste
 ax.set_xlim(lonmin, lonmax)
 ax.set_ylim(latmin, latmax)
+
+# Remover as bordas dos eixos (superior, inferior, direito e esquerdo)
+ax.spines['top'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.spines['right'].set_visible(False)
 
 cores = ['#262626', '#3d3835', '#4d423c', '#674f42', '#937260', '#b38871', '#cf9678', '#e78d5e', '#fdb99d']
 cmap = ListedColormap(cores)
@@ -107,14 +128,22 @@ map1 = ax.contourf(files['lon'],
                    cmap='hot',
                    vmin=0, vmax=160,
                    levels=np.array([0, 5, 10, 15, 20, 30, 40, 50, 60, 70, 100, 130, 160]),
-                   extend='max')
+                   extend='both')
 
 # Adiciona a barra de cores
 cbar = plt.colorbar(map1, ax=ax)
 cbar.set_label('Fonte: INPE/Pixel: 20km', color='white', fontsize=15)
-cbar.set_ticks([0, 20, 50, 100, 150])
-cbar.set_ticklabels(['0','20', '50', '100', '150'])
+# cbar.set_ticks([0, 20, 50, 100, 150])
+# cbar.set_ticklabels(['0','20', '50', '100', '150'])
 
+# Remover o contorno da barra de cores
+cbar.outline.set_visible(False)
+
+
+# Configurar para que não haja "tamanho" nos ticks (remove borda branca)
+cbar.ax.tick_params(size=0)
+
+# Configurações de cor da barra de cores
 cbar.ax.yaxis.set_tick_params(color='white')
 cbar.ax.yaxis.label.set_color('white')
 cbar.ax.tick_params(colors='white')
@@ -124,7 +153,9 @@ ax.set_title('Acumulado de Focos', fontsize=20, weight='bold', color='white')
 
 # Adiciona subtítulo com o total de focos
 total = int(np.sum(files['focos']))
-ax.text(lonmin + 0.5, latmax - 1.2, f'Período = {ano} / Total de focos={total}', color='white', fontsize=14)
+ax.text(lonmin + 0.3, latmax - 1.2, f'Período = {ano}/{mes_selecionado}', color='white', fontsize=14)
+ax.text(lonmin + 0.3, latmax - 2.2, f'Total de focos = {total}', color='white', fontsize=14)
+
 
 # Plota contorno dos estados e do Brasil
 estados_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/estados_do_brasil/BR_UF_2019.shp')
@@ -133,10 +164,11 @@ estados_brasil.plot(edgecolor='gray', facecolor='none', linewidth=0.5, alpha=1, 
 contorno_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/brasil/BRAZIL.shp')
 contorno_brasil.plot(edgecolor='gray', facecolor='none', linewidth=0.5, alpha=1, ax=ax)
 
-# Configura cores dos rótulos dos eixos e ticks
-ax.xaxis.label.set_color('white')
-ax.yaxis.label.set_color('white')
-ax.tick_params(axis='x', colors='white', labelsize=10)
-ax.tick_params(axis='y', colors='white', labelsize=10)
+# Remove os rótulos e ticks de lat e lon
+ax.set_xticks([])
+ax.set_yticks([])
+ax.set_xlabel('')
+ax.set_ylabel('')
 
+# Ajuste da figura com col10
 col10.pyplot(fig)
