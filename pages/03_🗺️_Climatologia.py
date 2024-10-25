@@ -73,7 +73,7 @@ nlat = len(lats)
 
 
 with st.sidebar:
-    rad = st.radio('Climatologia',['Por Ano','Por Mês'])
+    rad = st.radio('Climatologia',['Por Ano','Por Mês','Ano Mês'])
     if rad == 'Por Ano':
 
         # seleciona a "DATA"
@@ -82,7 +82,7 @@ with st.sidebar:
         dataselec = selec
         df_selec = df.loc[f'{selec}']
 
-    else:
+    elif rad == 'Por Mês':
         # Mapeamento dos números dos meses para os nomes dos meses
         meses_nomes = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 
                     'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
@@ -94,6 +94,24 @@ with st.sidebar:
         dataselec = meses_nomes[selec - 1]
         st.sidebar.divider()
         df_selec = df[df.index.month == selec]
+    else:
+        
+        # seleciona a "DATA"
+        anos_disponiveis = sorted(df.index.year.unique())
+        seleca = st.sidebar.selectbox('Ano Desejado', anos_disponiveis, index = 21)##############SELECBOX ANO ###################
+
+        
+        # Mapeamento dos números dos meses para os nomes dos meses
+        meses_nomes = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 
+                    'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
+        # Seleciona os meses disponíveis no DataFrame
+        mes_disponiveis = sorted(df.index.month.unique())
+        
+        # Exibe o selectbox com os nomes dos meses, mas retorna o número do mês
+        selec = st.sidebar.selectbox('Mes Desejado', mes_disponiveis, format_func=lambda x: meses_nomes[x-1])
+        dataselec = f'{meses_nomes[selec - 1]}/{seleca}'
+        st.sidebar.divider()
+        df_selec = df.loc[f'{selec}-{seleca}']
         
    
         
