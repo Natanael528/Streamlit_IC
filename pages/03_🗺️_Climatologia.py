@@ -146,7 +146,7 @@ map1 = ax.contourf(files['lon'],
                    cmap='hot',
                    vmin=0, vmax=160,
                    levels=np.array([0, 5, 10, 15, 20, 30, 40, 50, 60, 70, 100, 130, 160]),
-                   extend='both')
+                   extend='max')
 
 #Adiciona a barra de cores
 cbar = plt.colorbar(map1, ax=ax)
