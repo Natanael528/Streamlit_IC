@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import xarray as xr
+from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import geopandas as gpd
@@ -21,23 +22,20 @@ with open('style.css') as f:
 st.logo('Logos/cropped-simbolo_RGB.png',
         link= 'https://meteorologia.unifei.edu.br')
 
-
+##############################################################definindo funçoes################################################################
 
 @st.cache_data
 def load_data():
     #Lendo os DataFrames comprimidos
     df_lat = pd.read_csv('dados/lat.csv', compression='zip')
     df_lon = pd.read_csv('dados/lon.csv', compression='zip')
-    df_municipios = pd.read_csv('dados/municipios.csv', compression='zip')
-    df_estados = pd.read_csv('dados/estados.csv', compression='zip')
-    df_biomas = pd.read_csv('dados/biomas.csv', compression='zip')
     
     #normalizando latitude e longitude
     df_lat['lat'] = df_lat['lat'] / 10000
     df_lon['lon'] = df_lon['lon'] / 10000
     
     #Concatenando os DataFrames
-    df = pd.concat([df_lat, df_lon, df_municipios, df_estados, df_biomas], axis=1)
+    df = pd.concat([df_lat, df_lon], axis=1)
     df['data'] = pd.to_datetime(df['data'])
     df.set_index('data', inplace=True)
     df = df.sort_values('data')  
@@ -55,7 +53,7 @@ def index(longitudes_matriz, latitudes_matriz, lon_foco, lat_foco):
     return indice_lat_foco, indice_lon_foco
 
 df = load_data()
-col9, col10, col11 = st.columns([2,8,2])
+col9, col10, col11 = st.columns([2.5,7,2.5], gap='small')
 
 
 
@@ -83,7 +81,19 @@ with st.sidebar:
         selec = st.sidebar.selectbox('Ano Desejado', anos_disponiveis, index = 21)##############SELECBOX ANO ###################
         dataselec = selec
         df_selec = df.loc[f'{selec}']
+        
+        # # seleciona a "DATA" TESTE LER DIRETO
+        # now = int(datetime.now().strftime("%Y"))
+        # anos_disponiveis = np.arange(2003,now,1)
 
+        # selec = st.sidebar.selectbox('Ano Desejado', anos_disponiveis)##############SELECBOX ANO ###################
+        # dataselec = selec
+        # print(selec)
+        # df_selec = pd.read_csv("https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/anual/Brasil_sat_ref/focos_br_ref_2003.zip", usecols=(['lat', 'lon','data_pas']))
+        # df_selec['data'] = pd.to_datetime(df_selec['data_pas'])
+        # df_selec.set_index('data', inplace=True)
+        
+          
     else:
         
         #Seleciona o ano desejado
@@ -103,9 +113,8 @@ with st.sidebar:
         st.sidebar.divider()
 
         df_selec = df.loc[f'{selec}-{selecaano}']
-        
-   
-        
+
+     
 focos_lon, focos_lat = df_selec['lon'].values, df_selec['lat'].values
 focos = np.zeros((nlat, nlon))
 
@@ -121,20 +130,24 @@ files = xr.Dataset(data_vars=data_vars, coords=coords)
 
 
 
-
+##############################################################PLOTANDO A FIGURA################################################################
 
 #Plota a figura
-fig, ax = plt.subplots(figsize=(14, 12), facecolor='#a1a1a121')
+fig, ax = plt.subplots(figsize=(15, 12), dpi=300, facecolor='#a1a1a121')
 
 #Definir limites do mapa com ajuste
 ax.set_xlim(lonmin, lonmax)
 ax.set_ylim(latmin, latmax)
+
+
 
 #Remover as bordas dos eixos (superior, inferior, direito e esquerdo)
 ax.spines['top'].set_visible(False)
 ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.spines['right'].set_visible(False)
+
+
 
 cores = ['#262626', '#3d3835', '#4d423c', '#674f42', '#937260', '#b38871', '#cf9678', '#e78d5e', '#fdb99d']
 cmap = ListedColormap(cores)
@@ -148,17 +161,19 @@ map1 = ax.contourf(files['lon'],
                    levels=np.array([0, 5, 10, 15, 20, 30, 40, 50, 60, 70, 100, 130, 160]),
                    extend='max')
 
-#Adiciona a barra de cores
-cbar = plt.colorbar(map1, ax=ax)
-cbar.set_label('Fonte: INPE/Pixel: 20km', color='white', fontsize=15)
 
-#Remover o contorno da barra de cores
-cbar.outline.set_visible(False)
+#Adiciona a barra de cores
+cax = fig.add_axes([0.6, 0.18, 0.2, 0.03])  # Ajuste esses valores para posicionar a colorbar
+cbar = plt.colorbar(map1, cax=cax, orientation='horizontal')
+
+cbar.set_label('Fonte: INPE/Pixel: 20km', color='white', fontsize=15)
 
 #onfigurações de cor da barra de cores
 cbar.ax.yaxis.set_tick_params(color='white')
 cbar.ax.yaxis.label.set_color('white')
 cbar.ax.tick_params(colors='white')
+
+ax.set_facecolor('#323439') #Tirar a barra branca 
 
 #Título da figura
 ax.set_title('Acumulado de Focos', fontsize=20, weight='bold', color='white')
@@ -182,5 +197,6 @@ ax.set_yticks([])
 ax.set_xlabel('')
 ax.set_ylabel('')
 
+
 #Ajuste da figura com col10
-col10.pyplot(fig)
+col10.pyplot(fig, use_container_width=True)
