@@ -76,7 +76,7 @@ def convert_df(df):
 df = load_data()
 
 with st.sidebar:
-    rad = st.radio('Serie temporal',['Brasil','Por Estado'])
+    rad = st.radio('Série temporal',['Brasil','Por Estado'])
     if rad == 'Brasil':
         
         # seleciona a "DATA"
