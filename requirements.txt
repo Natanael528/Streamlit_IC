@@ -1,6 +1,7 @@
 streamlit
 plotly
 salem
+rasterio
 bs4
 xarray
 streamlit_folium
