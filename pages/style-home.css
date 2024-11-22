@@ -1,0 +1,91 @@
+/* ####tamanho da logo######### */
+[alt=Logo] {
+    height: 4rem;
+}
+
+/*#####tirar os botoes da lateral######*/
+.stDeployButton > button,
+#MainMenu,
+.st-emotion-cache-14x9thb > button,
+.st-emotion-cache-4z1n4l > img,
+.st-emotion-cache-4z1n4l > label {
+    visibility: hidden;
+}
+/*#### fonte subheader####*/
+.st-emotion-cache-1jzia57.e1nzilvr2 h3{
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 600;
+    font-size: large;
+    color: rgba(250, 250, 250, 0.644);
+}
+
+/*####alterar cor do background da barra lateral######*/
+.st-emotion-cache-1wqrzgl { /*altera aki caso o site mudar novamente*/
+    background: linear-gradient(90deg, #1c1c1c 55.94%, rgba(28, 28, 28, 0) 100%) !important;
+}
+.st-emotion-cache-h4xjwg {
+    background: linear-gradient(180deg, #ff912a0c 5.94%, rgba(28, 28, 28, 0) 100%) !important;
+}
+.st-emotion-cache-1dp5vir {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 0.125rem;
+    background-image: linear-gradient(90deg, #212121, #FF902A, #212121);
+    z-index: 999990;
+}
+
+/*########## Botões ##########*/
+
+
+.st-emotion-cache-j7qwjs { /*tamanho da caixa de seleção*/
+    display: flex !important;
+    flex-direction: unset !important;
+}
+
+.row-widget.stSelectbox{
+   width: 170px !important;
+}
+
+.st-emotion-cache-1tuwfdi {
+    width: 207px !important;
+    position: fixed;
+}
+
+.stMarkdown .st-emotion-cache-1sno8jx.e1nzilvr4{
+    width: 231px !important;
+    margin-left: -50px !important;
+}
+
+
+
+/* ##### Background da página ####### */
+.st-emotion-cache-13k62yr {
+    position: absolute;
+    background: #262626;
+    color: #fff;
+    inset: 0;
+    color-scheme: dark;
+    overflow: hidden;
+}
+
+/*##### Gráficos ####*/
+.st-emotion-cache-ocqkz7 .main-svg,
+.st-emotion-cache-9aoz2h .main-svg {
+    background: #a1a1a121;
+    border-radius: 1.5rem;
+}
+.st-emotion-cache-ocqkz7 .main-svg .gtitle {
+    fill: white !important;
+}
+/*#### Imagem serie temporal*/
+.st-emotion-cache-1v0mbdj img{
+    border-radius: 1.5rem; /*arredondar os cantos*/
+}
+
+
+hr {
+    margin: 0px -25px 0px;
+    border-bottom: 1px solid rgb(250 250 250 / 0%);
+}

@@ -7,14 +7,15 @@ import folium
 
 st.set_page_config(layout='wide',
                    page_icon=':fire:',
-                   page_title='Unifei Queimadas',
+                   page_title='FireScope',
                    initial_sidebar_state='expanded',
                    )
 
-with open('style.css')as f:
+with open('pages/style-foco.css')as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
 
-st.logo('Logos/cropped-simbolo_RGB.png',
+st.logo('Logos/logomaior.png', icon_image='Logos/Logo-icon.png',
+        size= 'large',
         link= 'https://meteorologia.unifei.edu.br')
 
 ####################################################################### Download dados Por Funções ###########################################################
@@ -181,3 +182,15 @@ else:
         # Exibindo o mapa
         with col1:
             Map.to_streamlit(width=1500, height=775)
+            
+            
+st.sidebar.markdown(
+    """
+    <hr>
+    <footer style="text-align: left; font-size: 13px; color: grey;">
+    Desenvolvido por <a href="https://www.linkedin.com/in/natanaeis" style="text-decoration: none; color: #FF902A;">
+    Natanael Silva Oliveira</a> | © 2024
+    </footer>
+    """,
+    unsafe_allow_html=True,
+)

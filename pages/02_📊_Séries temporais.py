@@ -8,14 +8,17 @@ import seaborn as sns
 
 st.set_page_config(layout='wide',
                    page_icon=':fire:',
-                   page_title='Unifei Queimadas',
+                   page_title='FireScope',
                    initial_sidebar_state='expanded',
                    )
 # Leitura arquivo css
-with open('style.css')as f:
+with open('pages/style-serieT.css')as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
-st.logo('Logos/cropped-simbolo_RGB.png',
+    
+st.logo('Logos/logomaior.png', icon_image='Logos/Logo-icon.png',
+        size= 'large',
         link= 'https://meteorologia.unifei.edu.br')
+
 ####################################################################### Download dados Por Funções ###########################################################
 @st.cache_data
 def load_data():
@@ -25,22 +28,6 @@ def load_data():
     df_municipios = pd.read_csv('dados/municipios.csv', compression='zip')
     df_estados = pd.read_csv('dados/estados.csv', compression='zip')
     df_biomas = pd.read_csv('dados/biomas.csv', compression='zip')
-    
-    # Dataframe de 2024
-    # dflast = pd.DataFrame()
-    
-    # datainicio = datetime(2024, 1, 1)
-    # dataatual = datetime.now()
-
-    # for i in pd.date_range(datainicio, dataatual, freq='MS'):
-        
-    #     data = i.strftime("%Y%m")
-    #     df = pd.read_csv(f'https://dataserver-coids.inpe.br/queimadas/queimadas/focos/csv/mensal/Brasil/focos_mensal_br_{data}.csv', usecols=['data_hora_gmt', 'lat', 'lon', 'bioma', 'municipio', 'estado'])
-    #     df = df.rename(columns={'data_hora_gmt': 'data'})
-    #     df['data'] = pd.to_datetime(df['data'])
-    #     df.set_index('data', inplace=True)
-    #     dflast = pd.concat([dflast, df])
-    
     
     # Normalizando latitude e longitude
     df_lat['lat'] = df_lat['lat'] / 10000
@@ -76,7 +63,7 @@ def convert_df(df):
 df = load_data()
 
 with st.sidebar:
-    rad = st.radio('Serie temporal',['Brasil','Por Estado'])
+    rad = st.radio('Série temporal',['Brasil','Por Estado'])
     if rad == 'Brasil':
         
         # seleciona a "DATA"
@@ -299,3 +286,15 @@ else:
 
     plt.tight_layout()
     col7.pyplot(fig)   
+
+
+st.sidebar.markdown(
+    """
+    <hr>
+    <footer style="text-align: left; font-size: 13px; color: grey;">
+    Desenvolvido por <a href="https://www.linkedin.com/in/natanaeis" style="text-decoration: none; color: #FF902A;">
+    Natanael Silva Oliveira</a> | © 2024
+    </footer>
+    """,
+    unsafe_allow_html=True,
+)
