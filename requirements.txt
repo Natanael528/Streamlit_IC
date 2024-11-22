@@ -14,3 +14,4 @@ folium
 seaborn
 geopandas
 rioxarray
+localtileserver
