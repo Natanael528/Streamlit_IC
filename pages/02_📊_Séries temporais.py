@@ -287,7 +287,6 @@ else:
     plt.tight_layout()
     col7.pyplot(fig)   
 
-
 st.sidebar.markdown(
     """
     <hr>
