@@ -1,5 +1,6 @@
 streamlit
 plotly
+salem
 bs4
 xarray
 streamlit_folium
