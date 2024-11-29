@@ -13,5 +13,3 @@ timedelta
 folium
 seaborn
 geopandas
-# rioxarray
-# localtileserver
