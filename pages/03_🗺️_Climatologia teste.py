@@ -100,7 +100,7 @@ data_vars = {
     'focos': (('time', 'lat', 'lon'), focos[np.newaxis, :, :], {'units': 'ocorrências/400km²', 'long_name': 'Focos de Calor'})
 }
 coords = {'lat': lats, 'lon': lons, 'time': [pd.to_datetime(df_selec.index[0])]}
-focos_nc = xr.Dataset(data_vars=data_vars, coords=coords).salem.roi(shape=shapefile_brasil)
+focos_nc = xr.Dataset(data_vars=data_vars, coords=coords)#.salem.roi(shape=shapefile_brasil)
 
 
 # Salvar NetCDF temporariamente
