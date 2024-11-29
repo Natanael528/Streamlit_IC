@@ -1,12 +1,11 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import xarray as xr
-import salem
 import geopandas as gpd
 import leafmap.foliumap as leafmap
 import tempfile
 import json
+import xarray as xr
 
 #Configuração da página
 st.set_page_config(layout='wide',
@@ -25,168 +24,125 @@ st.logo('Logos/logomaior.png', icon_image='Logos/Logo-icon.png',
 
 ##############################################################definindo funçoes################################################################
 
+# Função para carregar dados
 @st.cache_data
 def load_data():
-    #Lendo os DataFrames comprimidos
+    # Lendo os DataFrames comprimidos
     df_lat = pd.read_csv('dados/lat.csv', compression='zip')
     df_lon = pd.read_csv('dados/lon.csv', compression='zip')
     
-    #normalizando latitude e longitude
+    # Normalizando latitude e longitude
     df_lat['lat'] = df_lat['lat'] / 10000
     df_lon['lon'] = df_lon['lon'] / 10000
     
-    #Concatenando os DataFrames
+    # Concatenando os DataFrames
     df = pd.concat([df_lat, df_lon], axis=1)
     df['data'] = pd.to_datetime(df['data'])
     df.set_index('data', inplace=True)
-    df = df.sort_values('data')  
+    return df.sort_values('data')
 
-    return df
+# Função para calcular índice i e j da localização do foco
+def find_indices(longitudes, latitudes, lon_foco, lat_foco):
+    distancia_lon = (longitudes - lon_foco) ** 2
+    distancia_lat = (latitudes - lat_foco) ** 2
+    indice_lon = np.argmin(distancia_lon)
+    indice_lat = np.argmin(distancia_lat)
+    return indice_lat, indice_lon
 
-#Função que calcula o índice i e j da localização do foco
-def index(longitudes_matriz, latitudes_matriz, lon_foco, lat_foco):
-    distancia_lon = (longitudes_matriz - lon_foco)**2
-    distancia_lat = (latitudes_matriz - lat_foco)**2
 
-    indice_lon_foco = np.nonzero(distancia_lon == np.min(distancia_lon))
-    indice_lat_foco = np.nonzero(distancia_lat == np.min(distancia_lat))
 
-    return indice_lat_foco, indice_lon_foco
-
+# Carregar os dados
 df = load_data()
-col9, col10, col11 = st.columns([2.5,7,2.5], gap='small')
 
-
-
-
-
-##############################################################ALGUNS CALCS################################################################
-
-# Placeholder para exibir progresso e atualizar elementos dinamicamente
+# Placeholder para exibir progresso
 placeholder = st.empty()
-
-# Mensagem inicial
 placeholder.markdown("Carregando dados...")
 
-
-#Leitura do shapefile do Brasil
+# Leitura do shapefile do Brasil
 shapefile_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/brasil/BRAZIL.shp')
 
-#Limites do Brasil
+# Configuração da grade de latitude e longitude
 lonmin, lonmax, latmin, latmax = -75.0, -34.0, -35.0, 7.0
-delta = 20/100.0
-
-# Progresso inicial (0%)
-placeholder.progress(0, "Montando a grade...")
-
-#Montando a grade
+delta = 0.2
 lons = np.arange(lonmin, lonmax, delta)
 lats = np.arange(latmax, latmin, -delta)
-nlon = len(lons)
-nlat = len(lats)
+nlon, nlat = len(lons), len(lats)
+
+# Sidebar para seleção de ano/mês
 with st.sidebar:
-    rad = st.radio('Climatologia',['Total Por Ano','Total Por Mês'])
+    rad = st.radio('Climatologia', ['Total Por Ano', 'Total Por Mês'])
+    anos_disponiveis = sorted(df.index.year.unique())
+    
     if rad == 'Total Por Ano':
-
-        # seleciona a "DATA"
-        anos_disponiveis = sorted(df.index.year.unique())
-        selec = st.sidebar.selectbox('Ano Desejado', anos_disponiveis, index = 21)##############SELECBOX ANO ###################
-        dataselec = selec
-        df_selec = df.loc[f'{selec}']
-        
-          
+        selec = st.selectbox('Ano Desejado', anos_disponiveis, index=len(anos_disponiveis) - 1)
+        df_selec = df[df.index.year == selec]
     else:
-        
-        #Seleciona o ano desejado
-        anos_disponiveis = sorted(df.index.year.unique())
-        selecaano = st.sidebar.selectbox('Ano Desejado', anos_disponiveis, index=21)
-
-
+        selecaano = st.selectbox('Ano Desejado', anos_disponiveis, index=len(anos_disponiveis) - 1)
         meses_nomes = ['JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO', 
-                    'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
-
-        #Filtra os meses disponíveis apenas para o ano selecionado
-        mes_disponiveis = sorted(df[df.index.year == selecaano].index.month.unique())
-
-        selec = st.sidebar.selectbox('Mes Desejado', mes_disponiveis, format_func=lambda x: meses_nomes[x-1])
-
-        dataselec = f'{meses_nomes[selec - 1]}/{selecaano}'
-        st.sidebar.divider()
-
-        df_selec = df.loc[f'{selec}-{selecaano}']
+                       'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO']
+        meses_disponiveis = sorted(df[df.index.year == selecaano].index.month.unique())
+        mes_selec = st.selectbox('Mês Desejado', meses_disponiveis, format_func=lambda x: meses_nomes[x - 1])
+        df_selec = df[(df.index.year == selecaano) & (df.index.month == mes_selec)]
+        
 
 
-# Progresso de 50%
-placeholder.progress(50, "Contanto fogueiras...")
+# Progresso de carregamento
+placeholder.progress(50, "Contando focos de calor...")
 
-# Gerando matriz de focos
-focos_lon, focos_lat = df_selec['lon'].values, df_selec['lat'].values
+# Gerar matriz de focos
 focos = np.zeros((nlat, nlon))
+for lonfoco, latfoco in zip(df_selec['lon'], df_selec['lat']):
+    lin, col = find_indices(lons, lats, lonfoco, latfoco)
+    focos[lin, col] += 1
 
-for lonfoco, latfoco in zip(focos_lon, focos_lat):
-    lin, col = index(lons, lats, lonfoco, latfoco)
-    focos[lin[0][0], col[0][0]] += 1
-
-
-# leitura do shapefile do Brasil
-shapefile = salem.read_shapefile('https://github.com/evmpython/shapefile/raw/main/brasil/BRAZIL.shp')
-
-# NetCDF com dimensão 'time'
-data_vars = {'focos': (('time', 'lat', 'lon'), focos[np.newaxis, :, :], {'units': 'ocorrências/400km²', 'long_name': 'Focos de Calor'})}
+# Criar NetCDF com dimensões lat/lon
+data_vars = {
+    'focos': (('time', 'lat', 'lon'), focos[np.newaxis, :, :], {'units': 'ocorrências/400km²', 'long_name': 'Focos de Calor'})
+}
 coords = {'lat': lats, 'lon': lons, 'time': [pd.to_datetime(df_selec.index[0])]}
-focos_nc = xr.Dataset(data_vars=data_vars, coords=coords).salem.roi(shape=shapefile)
+focos_nc = xr.Dataset(data_vars=data_vars, coords=coords).salem.roi(shape=shapefile_brasil)
 
-
-# Criando arquivo temporário para salvar o NetCDF
+# Salvar NetCDF temporariamente
 with tempfile.NamedTemporaryFile(suffix=".nc", delete=False) as tmp:
     focos_nc.to_netcdf(tmp.name)
     netcdf_path = tmp.name
-    
 
-##############################################################PLOTANDO A FIGURA################################################################
+# Progresso de carregamento
+placeholder.progress(75, "Preparando mapa...")
 
-
-placeholder.progress(75, "Quase lá...")
-
+# Ler contorno dos estados do Brasil
 estados_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/estados_do_brasil/BR_UF_2019.shp')
-#Convertendo para JSON
 estados_geojson = json.loads(estados_brasil.to_json())
 
 
-m = leafmap.Map(tiles='cartodbdark_matter')
+##############################################################PLOTAR MAPA################################################################
 
+
+# Configurar mapa
+m = leafmap.Map(tiles='cartodbdark_matter')
 m.add_geojson(estados_geojson, layer_name="Contorno Estados", style={"color": "gray", "weight": 0.5})
 
+# Adicionar NetCDF ao mapa
 params = {
     "width": 4.8,
     "height": 0.3,
     "vmin": 0,
-    "vmax": 160,
+    "vmax": np.max(focos),
     "cmap": "afmhot",
-    "label": "Focos de Calor/20km2",
+    "label": "Focos de Calor/20km²",
     "orientation": "horizontal",
-    "transparent": False,
 }
-
-m.add_netcdf(
-    netcdf_path,
-    variables=['focos'],
-    palette='afmhot',
-    layer_name="Focos de Calor",
-)
-
+m.add_netcdf(netcdf_path, variables=['focos'], palette='afmhot', layer_name="Focos de Calor")
 m.add_colormap(position=(71, 2), **params)
 
-placeholder.progress(100, "Tudo pronto! Preparando a vista panorâmica.")
-
-
+# Exibir mapa
 st.subheader("Mapa de Focos de Calor com Contorno dos Estados e do Brasil")
 m.to_streamlit(width=1400, height=700)
 
+# Limpar placeholder
 placeholder.empty()
 
-
-
+# Rodapé
 st.sidebar.markdown(
     """
     <hr>
