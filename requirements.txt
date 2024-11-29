@@ -13,4 +13,3 @@ timedelta
 folium
 seaborn
 geopandas
-salem
