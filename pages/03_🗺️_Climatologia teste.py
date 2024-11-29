@@ -95,18 +95,17 @@ for lonfoco, latfoco in zip(df_selec['lon'], df_selec['lat']):
     lin, col = find_indices(lons, lats, lonfoco, latfoco)
     focos[lin, col] += 1
 
-
 # Criar NetCDF com dimensões lat/lon
 data_vars = {
     'focos': (('time', 'lat', 'lon'), focos[np.newaxis, :, :], {'units': 'ocorrências/400km²', 'long_name': 'Focos de Calor'})
 }
 coords = {'lat': lats, 'lon': lons, 'time': [pd.to_datetime(df_selec.index[0])]}
-
 focos_nc = xr.Dataset(data_vars=data_vars, coords=coords).salem.roi(shape=shapefile_brasil)
 
-# Salvar NetCDF temporariamente e mantê-lo aberto
-temp_nc_file = tempfile.NamedTemporaryFile(suffix=".nc", delete=False)  # Não deletar automaticamente
-focos_nc.to_netcdf(temp_nc_file.name)
+# Salvar NetCDF temporariamente
+with tempfile.NamedTemporaryFile(suffix=".nc", delete=False) as tmp:
+    focos_nc.to_netcdf(tmp.name)
+    netcdf_path = tmp.name
 
 # Progresso de carregamento
 placeholder.progress(75, "Preparando mapa...")
@@ -114,6 +113,10 @@ placeholder.progress(75, "Preparando mapa...")
 # Ler contorno dos estados do Brasil
 estados_brasil = gpd.read_file('https://github.com/evmpython/shapefile/raw/main/estados_do_brasil/BR_UF_2019.shp')
 estados_geojson = json.loads(estados_brasil.to_json())
+
+
+##############################################################PLOTAR MAPA################################################################
+
 
 # Configurar mapa
 m = leafmap.Map(tiles='cartodbdark_matter')
@@ -129,7 +132,7 @@ params = {
     "label": "Focos de Calor/20km²",
     "orientation": "horizontal",
 }
-m.add_netcdf(temp_nc_file.name, variables=['focos'], palette='afmhot', layer_name="Focos de Calor")
+m.add_netcdf(netcdf_path, variables=['focos'], palette='afmhot', layer_name="Focos de Calor")
 m.add_colormap(position=(71, 2), **params)
 
 # Exibir mapa
@@ -139,5 +142,14 @@ m.to_streamlit(width=1400, height=700)
 # Limpar placeholder
 placeholder.empty()
 
-# Fechar o arquivo temporário
-temp_nc_file.close()
+# Rodapé
+st.sidebar.markdown(
+    """
+    <hr>
+    <footer style="text-align: left; font-size: 13px; color: grey;">
+    Desenvolvido por <a href="https://www.linkedin.com/in/natanaeis" style="text-decoration: none; color: #FF902A;">
+    Natanael Silva Oliveira</a> | © 2024
+    </footer>
+    """,
+    unsafe_allow_html=True,
+)
