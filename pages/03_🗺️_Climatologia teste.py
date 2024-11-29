@@ -102,6 +102,7 @@ data_vars = {
 coords = {'lat': lats, 'lon': lons, 'time': [pd.to_datetime(df_selec.index[0])]}
 focos_nc = xr.Dataset(data_vars=data_vars, coords=coords).salem.roi(shape=shapefile_brasil)
 
+
 # Salvar NetCDF temporariamente
 with tempfile.NamedTemporaryFile(suffix=".nc", delete=False) as tmp:
     focos_nc.to_netcdf(tmp.name)
