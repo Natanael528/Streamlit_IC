@@ -87,7 +87,7 @@ with st.sidebar:
 
         # Seleciona a "DATA"
         data_inicial = st.date_input('Data **INICIAL**:', date(2003, 1, 1))
-        data_final = st.date_input('Data **FINAL**:', date(2024, 9, 1))
+        data_final = st.date_input('Data **FINAL**:', date(2024, 12, 3))
         # filtra por Data
         df_filtrado = df.loc[str(data_inicial):str(data_final)]
 
