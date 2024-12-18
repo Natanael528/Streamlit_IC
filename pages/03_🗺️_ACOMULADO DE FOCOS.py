@@ -33,7 +33,6 @@ placeholder.markdown("Carregando dados...")
 
 
 
-
 @st.cache_data
 def load_data():
     #Lendo os DataFrames comprimidos
@@ -87,7 +86,7 @@ nlat = len(lats)
 placeholder.progress(50, "Contanto fogueiras...")
 
 with st.sidebar:
-    rad = st.radio('Climatologia',['Total Por Ano','Total Por Mês'])
+    rad = st.radio('Acomulado',['Total Por Ano','Total Por Mês'])
     if rad == 'Total Por Ano':
 
         # seleciona a "DATA"
