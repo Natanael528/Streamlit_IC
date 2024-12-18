@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import geopandas as gpd
 
-
+#
 #Configuração da página
 st.set_page_config(layout='wide',
                    page_icon=':fire:',
