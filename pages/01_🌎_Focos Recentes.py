@@ -11,10 +11,10 @@ st.set_page_config(layout='wide',
                    initial_sidebar_state='expanded',
                    )
 
-with open('GIT/Streamlit_IC/pages/style-foco.css')as f:
+with open('pages/style-foco.css')as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html = True)
 
-st.logo('GIT/Streamlit_IC/Logos/logomaior.png', icon_image='GIT/Streamlit_IC/Logos/logomaior.png',
+st.logo('Logos/logomaior.png', icon_image='Logos/Logo-icon.png',
         size= 'large',
         link= 'https://meteorologia.unifei.edu.br')
 
