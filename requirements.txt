@@ -1,10 +1,10 @@
-streamlit
+streamlit == 1.45.1
 plotly
 salem
-rasterio
+rasterio 
 bs4
 xarray
-streamlit_folium
+streamlit_folium == 0.22.0
 setuptools
 leafmap
 ipyleaflet
