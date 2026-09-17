@@ -173,6 +173,7 @@ else:
         else:
             dfiltrado = concatenated_df[concatenated_df['Satélite'] == selec]
           
+        Map = leafmap.Map(center=[-15, -55], zoom=4) 
         url_carto = "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=cb1_3oi9_1_2191ae0ee3e74c44c0d78e41"
         folium.TileLayer(tiles=url_carto, attr="CartoDB", name="CartoDB Dark", overlay=False).add_to(Map)
         
