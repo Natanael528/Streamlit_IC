@@ -8,8 +8,8 @@ streamlit_folium == 0.22.0
 setuptools
 leafmap
 ipyleaflet
-datetime
-timedelta
+#datetime
+#timedelta
 folium
 seaborn
 geopandas
