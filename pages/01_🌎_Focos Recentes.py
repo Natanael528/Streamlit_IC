@@ -104,9 +104,14 @@ if periodo == ('Últimos 7 dias'):
     dfiltrado = df[df['Satélite'] == selec]
     
 ######PLOTA FIGURA######
-    Map = leafmap.Map(center=[-19, -60], zoom=4, tiles='cartodbdark_matter')
+    Map = leafmap.Map(center=[-19, -60], zoom=4)
+    
+    url_carto = "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=cb1_3oi9_1_2191ae0ee3e74c44c0d78e41"
+    folium.TileLayer(tiles=url_carto, attr="CartoDB", name="CartoDB Dark", overlay=False).add_to(Map) # overlay=False garante que atue como mapa base
+    
     Map.add_points_from_xy(dfiltrado, x="Lon", y="Lat", layer_name="Marcadores")             
     Map.to_streamlit(width=1500, height=700)
+
     
     csv = convert_df(dfiltrado)
     st.sidebar.download_button(label="Download CSV", data = csv, file_name= f'{selec}_{index_selec}.csv') #botao de donwload dos dados selecionados
@@ -167,20 +172,19 @@ else:
             dfiltrado = concatenated_df  # Sem filtragem
         else:
             dfiltrado = concatenated_df[concatenated_df['Satélite'] == selec]
+          
         url_carto = "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=cb1_3oi9_1_2191ae0ee3e74c44c0d78e41"
-        Map = geemap.Map(center=[-15, -55], zoom=4, tiles=url_carto, attr="CartoDB", ee_initialize=False) # desativa a busca de credenciais do earth engine
+        folium.TileLayer(tiles=url_carto, attr="CartoDB", name="CartoDB Dark", overlay=False).add_to(Map)
         
 ######PLOTAGEM DAS FIGURAS######
-        # Adiciona pontos ao mapa com cores diferenciadas e informações no popup
         for _, row in dfiltrado.iterrows():
             popup_text = f"Hora: {row['Hora']}<br>Lat:{row['Lat']}<br>Lon:{row['Lon']}<br>Satelite:{row['Satélite']}"
             folium.Marker(
                 location=[row['Lat'], row['Lon']],
                 popup=popup_text,
-                icon =folium.Icon(color=row['color'],icon="fire")
+                icon=folium.Icon(color=row['color'], icon="fire")
             ).add_to(Map)
 
-        # Exibindo o mapa
         with col1:
             Map.to_streamlit(width=1500, height=775)
             
