@@ -13,3 +13,4 @@ ipyleaflet
 folium
 seaborn
 geopandas
+geemap == 0.35.3
