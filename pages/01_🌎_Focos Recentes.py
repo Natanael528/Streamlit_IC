@@ -168,7 +168,7 @@ else:
         else:
             dfiltrado = concatenated_df[concatenated_df['Satélite'] == selec]
         url_carto = "https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=cb1_3oi9_1_2191ae0ee3e74c44c0d78e41"
-        Map = geemap.Map(center=[-15, -55], zoom=4, tiles=url_carto, attr="CartoDB") #legal ta
+        Map = geemap.Map(center=[-15, -55], zoom=4, tiles=url_carto, attr="CartoDB", ee_initialize=False) # desativa a busca de credenciais do earth engine
         
 ######PLOTAGEM DAS FIGURAS######
         # Adiciona pontos ao mapa com cores diferenciadas e informações no popup
